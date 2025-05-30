@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.53">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andersen Chang, Tiffany M. Tang, Tarek M. Zikry, Genevera I. Allen">
+<meta name="dcterms.date" content="2025-05-30">
+
+<title>Finding Common Origins of Milky Way Stars</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../notebooks/06-astro-case-study-clustering-interpretation.html" rel="next">
+<link href="../notebooks/04-astro-case-study-clustering-train.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="../site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="../site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="../site_libs/datatables-binding-0.33/datatables.js"></script>
+<script src="../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="../site_libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="../site_libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="../site_libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="../site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="../site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+
+
+<link rel="stylesheet" href="../css/custom_style.css">
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/05-astro-case-study-clustering-validation.html">6 Clustering (validation)</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/01-astro-case-study-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/02-astro-case-study-eda.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 Exploratory Data Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/03-astro-case-study-dimension-reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 Dimension Reduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/04-astro-case-study-clustering-train.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Clustering (train)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/05-astro-case-study-clustering-validation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">6 Clustering (validation)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/06-astro-case-study-clustering-interpretation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 Intepreting Final Clusters</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#validation-cluster-generalizability" id="toc-validation-cluster-generalizability" class="nav-link active" data-scroll-target="#validation-cluster-generalizability">Validation: Cluster Generalizability</a></li>
+  <li><a href="#validation-stability-across-alternative-data-preprocessing" id="toc-validation-stability-across-alternative-data-preprocessing" class="nav-link" data-scroll-target="#validation-stability-across-alternative-data-preprocessing">Validation: Stability across Alternative Data Preprocessing</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Finding Common Origins of Milky Way Stars</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Andersen Chang, Tiffany M. Tang, Tarek M. Zikry, Genevera I. Allen </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 30, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="validation-cluster-generalizability" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="validation-cluster-generalizability">Validation: Cluster Generalizability</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show Code to Evaluate Cluster Generalizability using Test Data</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## this code chunk evaluates cluster generalizability using test data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="do">#### choose imputation methods ####</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>test_data_ls <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Mean-imputed"</span> <span class="ot">=</span> data_mean_imputed<span class="sc">$</span>test,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"RF-imputed"</span> <span class="ot">=</span> data_rf_imputed<span class="sc">$</span>test</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>train_data_ls <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Mean-imputed"</span> <span class="ot">=</span> data_mean_imputed<span class="sc">$</span>train,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"RF-imputed"</span> <span class="ot">=</span> data_rf_imputed<span class="sc">$</span>train</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="do">#### choose number of features ####</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>feature_modes <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Small"</span> <span class="ot">=</span> <span class="dv">7</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Medium"</span> <span class="ot">=</span> <span class="dv">11</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Big"</span> <span class="ot">=</span> <span class="dv">19</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="do">#### choose ks ####</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>ks <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">8</span>, <span class="dv">9</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="do">#### choose dimension reduction methods ####</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># raw data</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>identity_fun_ls <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">"Raw"</span> <span class="ot">=</span> <span class="cf">function</span>(x) x)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># pca</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>pca_fun_ls <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">"PCA"</span> <span class="ot">=</span> purrr<span class="sc">::</span><span class="fu">partial</span>(fit_pca, <span class="at">ndim =</span> <span class="dv">4</span>))</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># tsne</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>tsne_perplexities <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">100</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>tsne_fun_ls <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  tsne_perplexities,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> purrr<span class="sc">::</span><span class="fu">partial</span>(fit_tsne, <span class="at">dims =</span> <span class="dv">2</span>, <span class="at">perplexity =</span> .x)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(<span class="fu">sprintf</span>(<span class="st">"tSNE (perplexity = %d)"</span>, tsne_perplexities))</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co"># putting it together</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>dr_fun_ls <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  identity_fun_ls,</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  pca_fun_ls,</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  tsne_fun_ls</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="do">#### choose clustering methods ####</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="co"># kmeans</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>kmeans_fun_ls <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">"K-means"</span> <span class="ot">=</span> purrr<span class="sc">::</span><span class="fu">partial</span>(fit_kmeans, <span class="at">ks =</span> ks))</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="co"># spectral clustering</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>n_neighbors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">60</span>, <span class="dv">100</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>spectral_fun_ls <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  n_neighbors,</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> purrr<span class="sc">::</span><span class="fu">partial</span>(</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    fit_spectral_clustering, </span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">ks =</span> ks,</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">affinity =</span> <span class="st">"nearest_neighbors"</span>,</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_neighbors =</span> .x</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(<span class="fu">sprintf</span>(<span class="st">"Spectral (n_neighbors = %s)"</span>, n_neighbors))</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="co"># putting it together</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>clust_fun_ls <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  kmeans_fun_ls,</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>  spectral_fun_ls</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="do">#### Fit Clustering Pipelines ####</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>pipe_tib <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">expand_grid</span>(</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">train_data =</span> train_data_ls,</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  <span class="at">test_data =</span> test_data_ls,</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>  <span class="at">feature_mode =</span> feature_modes,</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>  <span class="at">dr_method =</span> dr_fun_ls,</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>  <span class="at">clust_method =</span> clust_fun_ls</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>    <span class="at">impute_mode_name =</span> <span class="fu">names</span>(train_data),</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">feature_mode_name =</span> <span class="fu">names</span>(feature_mode),</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">dr_method_name =</span> <span class="fu">names</span>(dr_method),</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">clust_method_name =</span> <span class="fu">names</span>(clust_method),</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> stringr<span class="sc">::</span><span class="fu">str_glue</span>(</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>      <span class="st">"{clust_method_name} [{impute_mode_name} + {feature_mode_name} + {dr_method_name}]"</span></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove some clustering pipelines to reduce computation burden</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>    <span class="co"># remove all big feature set + dimension-reduction runs</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span>((dr_method_name <span class="sc">!=</span> <span class="st">"Raw"</span>) <span class="sc">&amp;</span> (feature_mode_name <span class="sc">==</span> <span class="st">"Big"</span>))</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>pipe_ls <span class="ot">&lt;-</span> <span class="fu">split</span>(pipe_tib, <span class="fu">seq_len</span>(<span class="fu">nrow</span>(pipe_tib))) <span class="sc">|&gt;</span> </span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(pipe_tib<span class="sc">$</span>name)</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>fit_results_fname <span class="ot">&lt;-</span> <span class="fu">file.path</span>(RESULTS_PATH, <span class="st">"clustering_fits_test.rds"</span>)</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(fit_results_fname)) {</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(future)</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plan</span>(multisession, <span class="at">workers =</span> NCORES)</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>  <span class="co"># fit clustering pipelines (if not already cached)</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>  clust_fit_ls <span class="ot">&lt;-</span> furrr<span class="sc">::</span><span class="fu">future_map</span>(</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>    pipe_ls,</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(pipe_df) {</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>      g <span class="ot">&lt;-</span> <span class="fu">create_preprocessing_pipeline</span>(</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>        <span class="at">feature_mode =</span> pipe_df<span class="sc">$</span>feature_mode[[<span class="dv">1</span>]],</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>        <span class="at">preprocess_fun =</span> pipe_df<span class="sc">$</span>dr_method[[<span class="dv">1</span>]]</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>      clust_out <span class="ot">&lt;-</span> pipe_df<span class="sc">$</span>clust_method[[<span class="dv">1</span>]](</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> pipe_df<span class="sc">$</span>test_data[[<span class="dv">1</span>]], <span class="at">preprocess_fun =</span> g</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(clust_out)</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>    <span class="at">.options =</span> furrr<span class="sc">::</span><span class="fu">furrr_options</span>(</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>      <span class="at">seed =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>      <span class="at">globals =</span> <span class="fu">list</span>(</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>        <span class="at">ks =</span> ks,</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>        <span class="at">create_preprocessing_pipeline =</span> create_preprocessing_pipeline,</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>        <span class="at">get_abundance_data =</span> get_abundance_data,</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>        <span class="at">tsne_perplexities =</span> tsne_perplexities,</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>        <span class="at">n_neighbors =</span> n_neighbors,</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>        <span class="at">fit_kmeans =</span> fit_kmeans,</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>        <span class="at">fit_spectral_clustering =</span> fit_spectral_clustering</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>  <span class="co"># save fitted clustering pipelines</span></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(clust_fit_ls, <span class="at">file =</span> fit_results_fname)</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>  <span class="co"># evaluate generalizability of test clusters</span></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>  clust_fit_ls <span class="ot">&lt;-</span> clust_fit_ls <span class="sc">|&gt;</span> </span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>    purrr<span class="sc">::</span><span class="fu">map</span>(<span class="sc">~</span> .x<span class="sc">$</span>cluster_ids) <span class="sc">|&gt;</span> </span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>    purrr<span class="sc">::</span><span class="fu">list_flatten</span>(<span class="at">name_spec =</span> <span class="st">"{inner}: {outer}"</span>)</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>  clust_fit_df <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">names</span>(clust_fit_ls),</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>    <span class="at">cluster_ids =</span> clust_fit_ls</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate_clustering_results</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(k, clust_method_name) <span class="sc">|&gt;</span> </span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>      <span class="at">cluster_list =</span> <span class="fu">list</span>(cluster_ids),</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>  train_consensus_out_ls <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>    <span class="fu">file.path</span>(RESULTS_PATH, <span class="st">"consensus_clusters_train.rds"</span>)</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>  test_nbhd_mat_ls <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>  test_consensus_out_ls <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>  gen_errs <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(best_clust_methods)) {</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>    clust_method_name <span class="ot">&lt;-</span> best_clust_methods[[i]]<span class="sc">$</span>clust_method_name</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>    k <span class="ot">&lt;-</span> best_clust_methods[[i]]<span class="sc">$</span>k</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>    key <span class="ot">&lt;-</span> <span class="fu">names</span>(best_clust_methods)[i]</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>    keep_clust_ls <span class="ot">&lt;-</span> clust_fit_df <span class="sc">|&gt;</span> </span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>        k <span class="sc">==</span> <span class="sc">!!</span>k,</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>        clust_method_name <span class="sc">==</span> <span class="sc">!!</span>clust_method_name</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span> </span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">pull</span>(cluster_list)</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>    keep_clust_ls <span class="ot">&lt;-</span> keep_clust_ls[[<span class="dv">1</span>]]</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>    <span class="co"># compute neighborhood matrix</span></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>    test_nbhd_mat_ls[[key]] <span class="ot">&lt;-</span> <span class="fu">get_consensus_neighborhood_matrix</span>(keep_clust_ls)</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>    <span class="co"># aggregate stable clusters using consensus clustering</span></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>    test_nbhd_mat <span class="ot">&lt;-</span> test_nbhd_mat_ls[[key]]</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>    test_consensus_out_ls[[key]] <span class="ot">&lt;-</span> <span class="fu">fit_consensus_clusters</span>(test_nbhd_mat, <span class="at">k =</span> k)</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>    <span class="co"># assess generalizability</span></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>    data_pipe_tib <span class="ot">&lt;-</span> pipe_tib <span class="sc">|&gt;</span> </span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">distinct</span>(impute_mode_name, feature_mode_name, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="fu">sprintf</span>(<span class="st">"%s + %s"</span>, impute_mode_name, feature_mode_name)</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>    data_pipe_ls <span class="ot">&lt;-</span> <span class="fu">split</span>(data_pipe_tib, <span class="fu">seq_len</span>(<span class="fu">nrow</span>(data_pipe_tib))) <span class="sc">|&gt;</span> </span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>      <span class="fu">setNames</span>(data_pipe_tib<span class="sc">$</span>name)</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>    gen_errs[[key]] <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>      data_pipe_ls,</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>      <span class="cf">function</span>(data_pipe_df) {</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>        g <span class="ot">&lt;-</span> <span class="fu">create_preprocessing_pipeline</span>(</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>          <span class="at">feature_mode =</span> data_pipe_df<span class="sc">$</span>feature_mode[[<span class="dv">1</span>]],</span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>          <span class="at">preprocess_fun =</span> identity_fun_ls[[<span class="dv">1</span>]]</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>        X_train <span class="ot">&lt;-</span> <span class="fu">g</span>(data_pipe_df<span class="sc">$</span>train_data[[<span class="dv">1</span>]])</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>        X_test <span class="ot">&lt;-</span> <span class="fu">g</span>(data_pipe_df<span class="sc">$</span>test_data[[<span class="dv">1</span>]])</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cluster_generalizability</span>(</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>          <span class="at">X_train =</span> X_train,</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>          <span class="at">cluster_train =</span> train_consensus_out_ls[[key]]<span class="sc">$</span>cluster_ids,</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>          <span class="at">X_test =</span> X_test,</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>          <span class="at">cluster_test =</span> test_consensus_out_ls[[key]]<span class="sc">$</span>cluster_ids</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a>    test_consensus_out_ls,</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a>    <span class="fu">file.path</span>(RESULTS_PATH, <span class="st">"consensus_clusters_test.rds"</span>)</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a>    test_nbhd_mat_ls,</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a>    <span class="fu">file.path</span>(RESULTS_PATH, <span class="st">"consensus_neighborhood_matrices_test.rds"</span>)</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a>    gen_errs,</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a>    <span class="fu">file.path</span>(RESULTS_PATH, <span class="st">"generalizability_errors_test.rds"</span>)</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a>  <span class="co"># read in results (if already cached)</span></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a>  gen_errs <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a>    <span class="fu">file.path</span>(RESULTS_PATH, <span class="st">"generalizability_errors_test.rds"</span>)</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset column-page-right">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Cluster Generalizability</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Confusion Tables</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<section id="overall-generalizability" class="level4">
+<h4 class="anchored" data-anchor-id="overall-generalizability">Overall Generalizability</h4>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-8d32cfd9db97395c4a5f" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-8d32cfd9db97395c4a5f">{"x":{"filter":"none","vertical":false,"caption":"<caption><\/caption>","data":[["k = 8: K-means"],["<span style=\"     \" >0.401<\/span>"],["<span style=\"     \" >0.423<\/span>"],["<span style=\"     \" >0.418<\/span>"],["<span style=\"     \" >0.398<\/span>"],["<span style=\"     \" >0.429<\/span>"],["<span style=\"     \" >0.421<\/span>"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Pipeline<\/th>\n      <th>Mean-imputed + Small<\/th>\n      <th>Mean-imputed + Medium<\/th>\n      <th>Mean-imputed + Big<\/th>\n      <th>RF-imputed + Small<\/th>\n      <th>RF-imputed + Medium<\/th>\n      <th>RF-imputed + Big<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-center","targets":[0,1,2,3,4,5,6]},{"name":"Pipeline","targets":0},{"name":"Mean-imputed + Small","targets":1},{"name":"Mean-imputed + Medium","targets":2},{"name":"Mean-imputed + Big","targets":3},{"name":"RF-imputed + Small","targets":4},{"name":"RF-imputed + Medium","targets":5},{"name":"RF-imputed + Big","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p>Overall generalizability, computed as the ARI between the estimated test cluster labels and the predicted cluster labels.</p>
+</div>
+</div>
+</section>
+<section id="local-generalizability" class="level4">
+<h4 class="anchored" data-anchor-id="local-generalizability">Local Generalizability</h4>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-d701554a25665d09d09f" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-d701554a25665d09d09f">{"x":{"filter":"none","vertical":false,"class":"display","caption":"<caption><\/caption>","data":[["Mean-imputed + Small","Mean-imputed + Medium","Mean-imputed + Big","RF-imputed + Small","RF-imputed + Medium","RF-imputed + Big"],["<span style=\"     \" >0.794<\/span>","<span style=\"     \" >0.773<\/span>","<span style=\"     \" >0.785<\/span>","<span style=\"     \" >0.781<\/span>","<span style=\"     \" >0.773<\/span>","<span style=\"     \" >0.773<\/span>"],["<span style=\"     \" >1.00<\/span>","<span style=\"     \" >1.00<\/span>","<span style=\"     \" >1.00<\/span>","<span style=\"     \" >1.00<\/span>","<span style=\"     \" >1.00<\/span>","<span style=\"     \" >1.00<\/span>"],["<span style=\"     \" >0.415<\/span>","<span style=\"     \" >0.468<\/span>","<span style=\"     \" >0.433<\/span>","<span style=\"     \" >0.417<\/span>","<span style=\"     \" >0.464<\/span>","<span style=\"     \" >0.429<\/span>"],["<span style=\"     \" >0.570<\/span>","<span style=\"     \" >0.562<\/span>","<span style=\"     \" >0.538<\/span>","<span style=\"     \" >0.570<\/span>","<span style=\"     \" >0.562<\/span>","<span style=\"     \" >0.546<\/span>"],["<span style=\"     \" >0.485<\/span>","<span style=\"     \" >0.595<\/span>","<span style=\"     \" >0.704<\/span>","<span style=\"     \" >0.514<\/span>","<span style=\"     \" >0.632<\/span>","<span style=\"     \" >0.621<\/span>"],["<span style=\"     \" >0.808<\/span>","<span style=\"     \" >0.803<\/span>","<span style=\"     \" >0.812<\/span>","<span style=\"     \" >0.797<\/span>","<span style=\"     \" >0.817<\/span>","<span style=\"     \" >0.814<\/span>"],["<span style=\"     \" >0.580<\/span>","<span style=\"     \" >0.642<\/span>","<span style=\"     \" >0.637<\/span>","<span style=\"     \" >0.586<\/span>","<span style=\"     \" >0.658<\/span>","<span style=\"     \" >0.649<\/span>"],["<span style=\"     \" >0.909<\/span>","<span style=\"     \" >0.924<\/span>","<span style=\"     \" >0.925<\/span>","<span style=\"     \" >0.894<\/span>","<span style=\"     \" >0.925<\/span>","<span style=\"     \" >0.925<\/span>"]],"container":"<table>\n  <thead>\n    <tr>\n      <th>Data Mode<\/th>\n      <th>Train Cluster 1<\/th>\n      <th>Train Cluster 2<\/th>\n      <th>Train Cluster 3<\/th>\n      <th>Train Cluster 4<\/th>\n      <th>Train Cluster 5<\/th>\n      <th>Train Cluster 6<\/th>\n      <th>Train Cluster 7<\/th>\n      <th>Train Cluster 8<\/th>\n    <\/tr>\n  <\/thead>\n  <tfoot>\n    <tr>\n      <th>Mean<\/th>\n      <th>0.780<\/th>\n      <th>1.00<\/th>\n      <th>0.437<\/th>\n      <th>0.558<\/th>\n      <th>0.592<\/th>\n      <th>0.809<\/th>\n      <th>0.625<\/th>\n      <th>0.917<\/th>\n    <\/tr>\n  <\/tfoot>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-center","targets":[0,1,2,3,4,5,6,7,8]},{"name":"Data Mode","targets":0},{"name":"Train Cluster 1","targets":1},{"name":"Train Cluster 2","targets":2},{"name":"Train Cluster 3","targets":3},{"name":"Train Cluster 4","targets":4},{"name":"Train Cluster 5","targets":5},{"name":"Train Cluster 6","targets":6},{"name":"Train Cluster 7","targets":7},{"name":"Train Cluster 8","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p>Local generalizability, computed as the largest overlap between the predicted clusters and the estimated test clusters divided by the number of samples in the predicted cluster.</p>
+</div>
+</div>
+</section>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="tabset-margin-container"></div><div class="panel-tabset nav-pills">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Mean-imputed + Small</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Mean-imputed + Medium</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Mean-imputed + Big</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">RF-imputed + Small</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">RF-imputed + Medium</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false">RF-imputed + Big</a></li></ul>
+<div class="tab-content nav-pills">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-27a6251d00cbd347f90b" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-27a6251d00cbd347f90b">{"x":{"filter":"none","vertical":false,"caption":"<caption><\/caption>","data":[["Test Cluster 1","Test Cluster 2","Test Cluster 3","Test Cluster 4","Test Cluster 5","Test Cluster 6","Test Cluster 7","Test Cluster 8"],["<span style=\"     \" >50<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >6<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >2<\/span>"],["<span style=\"     \" >52<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >25<\/span>","<span style=\"     \" >51<\/span>","<span style=\"     \" >47<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >40<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >16<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >77<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >14<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >16<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >59<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >4<\/span>","<span style=\"     \" >6<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >65<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >18<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >27<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >60<\/span>","<span style=\"     \" >5<\/span>"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Predicted 1<\/th>\n      <th>Predicted 2<\/th>\n      <th>Predicted 3<\/th>\n      <th>Predicted 4<\/th>\n      <th>Predicted 5<\/th>\n      <th>Predicted 6<\/th>\n      <th>Predicted 7<\/th>\n      <th>Predicted 8<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":[1,2,3,4,5,6,7,8]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Predicted 1","targets":1},{"name":"Predicted 2","targets":2},{"name":"Predicted 3","targets":3},{"name":"Predicted 4","targets":4},{"name":"Predicted 5","targets":5},{"name":"Predicted 6","targets":6},{"name":"Predicted 7","targets":7},{"name":"Predicted 8","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-02880d8cbf9369760f4f" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-02880d8cbf9369760f4f">{"x":{"filter":"none","vertical":false,"caption":"<caption><\/caption>","data":[["Test Cluster 1","Test Cluster 2","Test Cluster 3","Test Cluster 4","Test Cluster 5","Test Cluster 6","Test Cluster 7","Test Cluster 8"],["<span style=\"     \" >51<\/span>","<span style=\"     \" >5<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >6<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >2<\/span>"],["<span style=\"     \" >51<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >13<\/span>","<span style=\"     \" >51<\/span>","<span style=\"     \" >45<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >40<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >16<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >77<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >12<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >22<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >57<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >7<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >77<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >14<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >27<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >61<\/span>","<span style=\"     \" >4<\/span>"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Predicted 1<\/th>\n      <th>Predicted 2<\/th>\n      <th>Predicted 3<\/th>\n      <th>Predicted 4<\/th>\n      <th>Predicted 5<\/th>\n      <th>Predicted 6<\/th>\n      <th>Predicted 7<\/th>\n      <th>Predicted 8<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":[1,2,3,4,5,6,7,8]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Predicted 1","targets":1},{"name":"Predicted 2","targets":2},{"name":"Predicted 3","targets":3},{"name":"Predicted 4","targets":4},{"name":"Predicted 5","targets":5},{"name":"Predicted 6","targets":6},{"name":"Predicted 7","targets":7},{"name":"Predicted 8","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-3ddf61f37a3b681f1823" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-3ddf61f37a3b681f1823">{"x":{"filter":"none","vertical":false,"caption":"<caption><\/caption>","data":[["Test Cluster 1","Test Cluster 2","Test Cluster 3","Test Cluster 4","Test Cluster 5","Test Cluster 6","Test Cluster 7","Test Cluster 8"],["<span style=\"     \" >51<\/span>","<span style=\"     \" >4<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >5<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >2<\/span>"],["<span style=\"     \" >51<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >17<\/span>","<span style=\"     \" >52<\/span>","<span style=\"     \" >51<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >46<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >16<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >78<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >7<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >19<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >4<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >56<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >6<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >72<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >12<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >27<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >62<\/span>","<span style=\"     \" >4<\/span>"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Predicted 1<\/th>\n      <th>Predicted 2<\/th>\n      <th>Predicted 3<\/th>\n      <th>Predicted 4<\/th>\n      <th>Predicted 5<\/th>\n      <th>Predicted 6<\/th>\n      <th>Predicted 7<\/th>\n      <th>Predicted 8<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":[1,2,3,4,5,6,7,8]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Predicted 1","targets":1},{"name":"Predicted 2","targets":2},{"name":"Predicted 3","targets":3},{"name":"Predicted 4","targets":4},{"name":"Predicted 5","targets":5},{"name":"Predicted 6","targets":6},{"name":"Predicted 7","targets":7},{"name":"Predicted 8","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-e7caa58884ced2907e90" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-e7caa58884ced2907e90">{"x":{"filter":"none","vertical":false,"caption":"<caption><\/caption>","data":[["Test Cluster 1","Test Cluster 2","Test Cluster 3","Test Cluster 4","Test Cluster 5","Test Cluster 6","Test Cluster 7","Test Cluster 8"],["<span style=\"     \" >50<\/span>","<span style=\"     \" >4<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >6<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >1<\/span>"],["<span style=\"     \" >52<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >24<\/span>","<span style=\"     \" >50<\/span>","<span style=\"     \" >46<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >40<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >16<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >77<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >14<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >18<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >59<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >5<\/span>","<span style=\"     \" >6<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >65<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >17<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >27<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >59<\/span>","<span style=\"     \" >6<\/span>"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Predicted 1<\/th>\n      <th>Predicted 2<\/th>\n      <th>Predicted 3<\/th>\n      <th>Predicted 4<\/th>\n      <th>Predicted 5<\/th>\n      <th>Predicted 6<\/th>\n      <th>Predicted 7<\/th>\n      <th>Predicted 8<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":[1,2,3,4,5,6,7,8]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Predicted 1","targets":1},{"name":"Predicted 2","targets":2},{"name":"Predicted 3","targets":3},{"name":"Predicted 4","targets":4},{"name":"Predicted 5","targets":5},{"name":"Predicted 6","targets":6},{"name":"Predicted 7","targets":7},{"name":"Predicted 8","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-a43969c2d20cde42b049" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-a43969c2d20cde42b049">{"x":{"filter":"none","vertical":false,"caption":"<caption><\/caption>","data":[["Test Cluster 1","Test Cluster 2","Test Cluster 3","Test Cluster 4","Test Cluster 5","Test Cluster 6","Test Cluster 7","Test Cluster 8"],["<span style=\"     \" >51<\/span>","<span style=\"     \" >5<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >6<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >2<\/span>"],["<span style=\"     \" >51<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >14<\/span>","<span style=\"     \" >51<\/span>","<span style=\"     \" >45<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >40<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >16<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >77<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >11<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >24<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >58<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >7<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >77<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >12<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >27<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >62<\/span>","<span style=\"     \" >4<\/span>"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Predicted 1<\/th>\n      <th>Predicted 2<\/th>\n      <th>Predicted 3<\/th>\n      <th>Predicted 4<\/th>\n      <th>Predicted 5<\/th>\n      <th>Predicted 6<\/th>\n      <th>Predicted 7<\/th>\n      <th>Predicted 8<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":[1,2,3,4,5,6,7,8]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Predicted 1","targets":1},{"name":"Predicted 2","targets":2},{"name":"Predicted 3","targets":3},{"name":"Predicted 4","targets":4},{"name":"Predicted 5","targets":5},{"name":"Predicted 6","targets":6},{"name":"Predicted 7","targets":7},{"name":"Predicted 8","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-376a78f75a7321aba26c" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-376a78f75a7321aba26c">{"x":{"filter":"none","vertical":false,"caption":"<caption><\/caption>","data":[["Test Cluster 1","Test Cluster 2","Test Cluster 3","Test Cluster 4","Test Cluster 5","Test Cluster 6","Test Cluster 7","Test Cluster 8"],["<span style=\"     \" >51<\/span>","<span style=\"     \" >4<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >6<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >2<\/span>"],["<span style=\"     \" >51<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >17<\/span>","<span style=\"     \" >51<\/span>","<span style=\"     \" >51<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >43<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >17<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >77<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >9<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >18<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >3<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >57<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >7<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >74<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >11<\/span>","<span style=\"     \" >2<\/span>","<span style=\"     \" >27<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>"],["<span style=\"     \" >0<\/span>","<span style=\"     \" >1<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >0<\/span>","<span style=\"     \" >62<\/span>","<span style=\"     \" >4<\/span>"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Predicted 1<\/th>\n      <th>Predicted 2<\/th>\n      <th>Predicted 3<\/th>\n      <th>Predicted 4<\/th>\n      <th>Predicted 5<\/th>\n      <th>Predicted 6<\/th>\n      <th>Predicted 7<\/th>\n      <th>Predicted 8<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":[1,2,3,4,5,6,7,8]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Predicted 1","targets":1},{"name":"Predicted 2","targets":2},{"name":"Predicted 3","targets":3},{"name":"Predicted 4","targets":4},{"name":"Predicted 5","targets":5},{"name":"Predicted 6","targets":6},{"name":"Predicted 7","targets":7},{"name":"Predicted 8","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="validation-stability-across-alternative-data-preprocessing" class="level2">
+<h2 class="anchored" data-anchor-id="validation-stability-across-alternative-data-preprocessing">Validation: Stability across Alternative Data Preprocessing</h2>
+<details class="code-fold">
+<summary>Show Code to Evaluate Cluster Stability Across Alternative Data Preprocessing Pipelines</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default QC thresholds</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>default_grid <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">snr =</span> <span class="dv">70</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">vb =</span> <span class="fl">0.9</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">logg =</span> <span class="fl">3.6</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">teff_width =</span> <span class="dv">1000</span>  <span class="co"># yields [3500, 5500]</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter grids to sweep</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>vary_param_grid <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">snr =</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">50</span>, <span class="dv">70</span>, <span class="dv">90</span>, <span class="dv">110</span>, <span class="dv">130</span>, <span class="dv">150</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">vb =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.7</span>, <span class="fl">0.9</span>, <span class="fl">0.99</span>),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">logg =</span> <span class="fu">c</span>(<span class="fl">3.0</span>, <span class="fl">3.3</span>, <span class="fl">3.6</span>, <span class="fl">3.9</span>, <span class="fl">4.2</span>),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">teff_width =</span> <span class="fu">c</span>(<span class="dv">500</span>, <span class="dv">1000</span>, <span class="dv">1500</span>, <span class="dv">2000</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>data_mean_imputed_train <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_cols</span>(</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  metadata<span class="sc">$</span>train, data_mean_imputed<span class="sc">$</span>train</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>data_rf_imputed_train <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_cols</span>(</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  metadata<span class="sc">$</span>train, data_rf_imputed<span class="sc">$</span>train</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Get original cluster fit</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>orig_clusters <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(RESULTS_PATH, <span class="st">"consensus_clusters_train.rds"</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>)[[best_clust_method_name]]<span class="sc">$</span>cluster_ids</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>stability_results_fname <span class="ot">&lt;-</span> <span class="fu">file.path</span>(</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  RESULTS_PATH, <span class="st">"clustering_fits_stability.rds"</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(stability_results_fname)) {</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  stability_fits_ls <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (param_name <span class="cf">in</span> <span class="fu">names</span>(vary_param_grid)) {</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    param_grid_ls <span class="ot">&lt;-</span> default_grid</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    param_grid_ls[[param_name]] <span class="ot">&lt;-</span> vary_param_grid[[param_name]]</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    param_grid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(param_grid_ls)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    stability_fits_ls[[param_name]] <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>      <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(param_grid),</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>      <span class="cf">function</span>(i) {</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        snr <span class="ot">&lt;-</span> param_grid<span class="sc">$</span>snr[[i]]</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        vb <span class="ot">&lt;-</span> param_grid<span class="sc">$</span>vb[[i]]</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        logg <span class="ot">&lt;-</span> param_grid<span class="sc">$</span>logg[[i]]</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        teff_width <span class="ot">&lt;-</span> param_grid<span class="sc">$</span>teff_width[[i]]</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># get new QC-filtered data</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        data_mean_imputed_qc <span class="ot">&lt;-</span> <span class="fu">apply_qc_filtering</span>(</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>          data_mean_imputed_train, </span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>          <span class="at">snr_threshold =</span> snr,</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>          <span class="at">teff_thresholds =</span> <span class="fu">c</span>(<span class="dv">4500</span> <span class="sc">-</span> teff_width, <span class="dv">4500</span> <span class="sc">+</span> teff_width),</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>          <span class="at">logg_threshold =</span> logg,</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>          <span class="at">starflag =</span> <span class="dv">0</span>,</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>          <span class="at">vb_threshold =</span> vb</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        data_rf_imputed_qc <span class="ot">&lt;-</span> <span class="fu">apply_qc_filtering</span>(</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>          data_rf_imputed_train, </span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>          <span class="at">snr_threshold =</span> snr,</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>          <span class="at">teff_thresholds =</span> <span class="fu">c</span>(<span class="dv">4500</span> <span class="sc">-</span> teff_width, <span class="dv">4500</span> <span class="sc">+</span> teff_width),</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>          <span class="at">logg_threshold =</span> logg,</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>          <span class="at">starflag =</span> <span class="dv">0</span>,</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>          <span class="at">vb_threshold =</span> vb</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>        <span class="co"># get sample ids for new QC-filtered data</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>        keep_sample_idxs <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>          <span class="at">APOGEE_ID =</span> data_mean_imputed_qc<span class="sc">$</span>meta<span class="sc">$</span>APOGEE_ID</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>          dplyr<span class="sc">::</span><span class="fu">left_join</span>(</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>            dplyr<span class="sc">::</span><span class="fu">bind_cols</span>(<span class="at">.id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(metadata<span class="sc">$</span>train), metadata<span class="sc">$</span>train),</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">"APOGEE_ID"</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>          ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>          dplyr<span class="sc">::</span><span class="fu">pull</span>(.id)</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        <span class="co"># fit clustering pipeline on new QC-filtered data</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>        cluster_ids <span class="ot">&lt;-</span> <span class="fu">fit_best_pipeline</span>(</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>          <span class="at">data_ls =</span> <span class="fu">list</span>(</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Mean-imputed"</span> <span class="ot">=</span> data_mean_imputed_qc<span class="sc">$</span>abundance,</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>            <span class="st">"RF-imputed"</span> <span class="ot">=</span> data_rf_imputed_qc<span class="sc">$</span>abundance</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>          ),</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>          <span class="at">k =</span> best_k</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>        <span class="co"># evaluate stability between original clusters and new clusters</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>        stability <span class="ot">&lt;-</span> mclust<span class="sc">::</span><span class="fu">adjustedRandIndex</span>(</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>          cluster_ids, orig_clusters[keep_sample_idxs]</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>          <span class="at">sample_ids =</span> keep_sample_idxs,</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>          <span class="at">cluster_ids =</span> cluster_ids,</span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>          <span class="at">stability =</span> stability</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>        ))</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>      <span class="fu">setNames</span>(vary_param_grid[[param_name]])</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(stability_fits_ls, stability_results_fname)</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>  stability_fits_ls <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(stability_results_fname)</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>stability_results_ls <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">imap</span>(</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>  stability_fits_ls,</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(x, key) {</span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>    purrr<span class="sc">::</span><span class="fu">map</span>(x, <span class="sc">~</span> <span class="fu">data.frame</span>(<span class="at">stability =</span> .x<span class="sc">$</span>stability)) <span class="sc">|&gt;</span> </span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(<span class="at">.id =</span> key) <span class="sc">|&gt;</span> </span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>        {{key}} <span class="sc">:</span><span class="er">=</span> <span class="fu">as.numeric</span>(.data[[key]])</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>plt_ls <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">imap</span>(</span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>  stability_results_ls,</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(stability_df, key) {</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>    param_title <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>      key <span class="sc">==</span> <span class="st">"snr"</span> <span class="sc">~</span> <span class="st">"SNR Threshold"</span>,</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>      key <span class="sc">==</span> <span class="st">"vb"</span> <span class="sc">~</span> <span class="st">"VB Threshold"</span>,</span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>      key <span class="sc">==</span> <span class="st">"logg"</span> <span class="sc">~</span> <span class="st">"Log(g) Threshold"</span>,</span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>      key <span class="sc">==</span> <span class="st">"teff_width"</span> <span class="sc">~</span> <span class="st">"Teff Width"</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>    stability_df <span class="sc">|&gt;</span> </span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span>rlang<span class="sc">::</span><span class="fu">sym</span>(key), <span class="at">y =</span> stability) <span class="sc">+</span></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">geom_line</span>(<span class="at">width =</span> <span class="fl">1.2</span>, <span class="at">color =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(<span class="at">width =</span> <span class="fl">2.5</span>, <span class="at">color =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">ylim</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">labs</span>(</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> param_title,</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="st">"ARI Stability"</span>,</span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.major =</span> ggplot2<span class="sc">::</span><span class="fu">element_line</span>(<span class="at">color =</span> <span class="st">"grey80"</span>),</span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y.left =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>)</span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> patchwork<span class="sc">::</span><span class="fu">wrap_plots</span>(plt_ls, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>  patchwork<span class="sc">::</span><span class="fu">plot_layout</span>(<span class="at">axes =</span> <span class="st">"collect"</span>)</span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a><span class="fu">subchunkify</span>(</span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>  plt, <span class="at">fig_height =</span> <span class="dv">4</span>, <span class="at">fig_width =</span> <span class="dv">10</span>,</span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"'Stability of cluster labels across different choices of data preprocessing pipelines.'"</span></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="05-astro-case-study-clustering-validation_files/figure-html/subchunk-validation-9-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Stability of cluster labels across different choices of data preprocessing pipelines."><img src="05-astro-case-study-clustering-validation_files/figure-html/subchunk-validation-9-1.png" class="img-fluid figure-img" width="960" alt="Stability of cluster labels across different choices of data preprocessing pipelines."></a></p>
+<figcaption>Stability of cluster labels across different choices of data preprocessing pipelines.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/DataSlingers\.github\.io\/unsupervised-workflow-astro\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../notebooks/04-astro-case-study-clustering-train.html" class="pagination-link" aria-label="5 Clustering (train)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">5 Clustering (train)</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../notebooks/06-astro-case-study-clustering-interpretation.html" class="pagination-link" aria-label="7 Intepreting Final Clusters">
+        <span class="nav-page-text">7 Intepreting Final Clusters</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","closeEffect":"zoom","loop":false,"descPosition":"bottom","openEffect":"zoom"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>
