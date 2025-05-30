@@ -1,0 +1,266 @@
+---
+title: "Finding Common Origins of Milky Way Stars"
+date: today
+author: "Andersen Chang, Tiffany M. Tang, Tarek M. Zikry, Genevera I. Allen"
+format:
+  html:
+    code-fold: true
+---
+
+```{r}
+#| include: false
+
+rm(list = ls())
+
+# source all functions from R/ folder
+for (fname in list.files(here::here("R"), pattern = "*.R")) {
+  source(here::here(file.path("R", fname)))
+}
+
+# helper paths
+DATA_PATH <- here::here("data")
+RESULTS_PATH <- here::here("results")
+if (!file.exists(RESULTS_PATH)) {
+  dir.create(RESULTS_PATH, recursive = TRUE)
+}
+
+# helpers for quarto plotting
+subchunkify <- purrr::partial(subchunkify, prefix = "eda")
+subchunk_idx <- 1  # for subchunk numbering
+
+# load in data
+load(file.path(DATA_PATH, "astro_cleaned_data.RData"))
+
+set.seed(12345)
+```
+
+## Exploratory Data Analysis
+
+```{r}
+# get X (using mean-imputed) and metadata for EDA
+metadata <- metadata$train
+feature_modes <- list("small" = 7, "medium" = 11, "big" = 19)
+train_data_ls <- purrr::map(
+  feature_modes,
+  ~ get_abundance_data(data_mean_imputed$train, feature_mode = .x)
+)
+features_ls <- purrr::map(train_data_ls, ~ colnames(.x))
+X <- train_data_ls$big
+```
+
+### Feature Distributions
+
+:::{.panel-tabset}
+
+#### Overall
+
+```{r}
+#| output: asis
+#| fig-cap: "Distribution of abundance values per feature in (mean-imputed) training data."
+
+# plot overall distribution
+ggwrappers::plot_histogram(X) +
+  ggplot2::facet_wrap(~ variable, scales = "free_x") +
+  ggplot2::labs(x = "Data")
+```
+
+#### By GC
+
+```{r}
+#| output: asis
+
+# plot boxplots per GC
+plt_df <- dplyr::bind_cols(
+  X,
+  metadata |> dplyr::select(GC_NAME)
+) |> 
+  dplyr::group_by(GC_NAME) |> 
+  dplyr::mutate(
+    GC_NAME = sprintf("%s (n = %d)", GC_NAME, dplyr::n())
+  ) |> 
+  dplyr::ungroup()
+plt_vars <- sort(colnames(X))
+plt_ls <- list()
+for (plt_var in plt_vars) {
+  plt_ls[[plt_var]] <- plt_df |> 
+    ggplot2::ggplot() +
+    ggplot2::aes(
+      x = reorder(GC_NAME, !!rlang::sym(plt_var)), 
+      y = !!rlang::sym(plt_var),
+      fill = GC_NAME
+    ) +
+    ggplot2::geom_boxplot() +
+    ggplot2::labs(x = "GC Name") +
+    vthemes::theme_vmodern() +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(
+        angle = 90, hjust = 1, vjust = 0.5
+      ),
+      legend.position = "none"
+    )
+}
+plt <- patchwork::wrap_plots(plt_ls, ncol = 2) +
+  patchwork::plot_layout(axis_titles = "collect")
+subchunkify(
+  plt, fig_height = 30, fig_width = 10, 
+  caption = "'Distribution of abundance values per feature and GC in (mean-imputed) training data.'"
+)
+```
+
+:::
+
+### Galactic Coordinate Plots
+
+:::{.panel-tabset}
+
+```{r}
+#| output: asis
+
+# plot galactic coordinates
+plt_df <- dplyr::bind_cols(
+  X,
+  metadata |> dplyr::select(GLON, GLAT, GC_NAME)
+) |> 
+  dplyr::group_by(GC_NAME) |> 
+  dplyr::mutate(
+    GC_NAME_STR = sprintf("%s (n = %d)", GC_NAME, dplyr::n())
+  ) |> 
+  dplyr::ungroup()
+plt_vars <- c("GC_NAME", sort(colnames(X)))
+for (plt_var in plt_vars) {
+  cat(sprintf("\n\n#### %s\n\n", plt_var))
+  
+  cat(sprintf("\n\n##### Unjittered\n\n"))
+  plt <- plt_df |> 
+    ggplot2::ggplot() +
+    ggplot2::aes(
+      x = GLON, 
+      y = GLAT, 
+      color = !!rlang::sym(plt_var),
+      label = GC_NAME
+    ) +
+    ggplot2::geom_jitter(size = 0.5, width = 0.5, height = 0.5) +
+    ggplot2::labs(
+      x = "Galactic Longitude", 
+      y = "Galactic Latitude"
+    ) +
+    vthemes::theme_vmodern()
+  if (plt_var != "GC_NAME") {
+    # use viridis color scheme
+    plt <- plt + vthemes::scale_color_vmodern(discrete = FALSE)
+  }
+  subchunkify(
+    plotly::ggplotly(plt),
+    caption = sprintf(
+      "'Unjittered scatter plot of the star locations (given by galactic coordinates), colored by %s.'",
+      plt_var
+    )
+  )
+  
+  cat(sprintf("\n\n##### Jittered\n\n"))
+  plt <- plt_df |> 
+    ggplot2::ggplot() +
+    ggplot2::aes(
+      x = GLON, 
+      y = GLAT, 
+      color = !!rlang::sym(plt_var),
+      label = GC_NAME
+    ) +
+    ggplot2::geom_jitter(size = 0.5, width = 15, height = 8) +
+    ggplot2::labs(
+      x = "Galactic Longitude (jittered)", 
+      y = "Galactic Latitude (jittered)"
+    ) +
+    vthemes::theme_vmodern()
+  if (plt_var != "GC_NAME") {
+    # use viridis color scheme
+    plt <- plt + vthemes::scale_color_vmodern(discrete = FALSE)
+  }
+  subchunkify(
+    plotly::ggplotly(plt),
+    caption = sprintf(
+      "'Jittered scatter plot of the star locations (given by galactic coordinates), colored by %s.'",
+      plt_var
+    )
+  )
+}
+```
+
+:::
+
+### Pair Plots
+
+:::{.panel-tabset}
+
+#### All GCs
+
+:::{.panel-tabset .nav-pills}
+
+```{r}
+#| output: asis
+
+for (idx in 1:length(features_ls)) {
+  features_name <- names(features_ls)[[idx]]
+  features <- features_ls[[idx]]
+  cat(sprintf("\n\n##### %s\n\n", stringr::str_to_title(features_name)))
+  keep_cols <- stringr::str_remove_all(colnames(X), "\\*") %in% features
+  plt <- ggwrappers::plot_pairs(
+    X[, sort(colnames(X)[keep_cols])], 
+    columns = 1:sum(keep_cols),
+    # color_lower = metadata$GC_NAME, 
+    # show_upper = FALSE
+    point_size = 0.1
+  )
+  subchunkify(
+    plt, 
+    fig_height = length(features),
+    fig_width = length(features),
+    caption = sprintf(
+      "'Pairwise scatter plot of chemical abundance features in %s feature set.'",
+      stringr::str_to_lower(features_name)
+    )
+  )
+}
+```
+
+:::
+
+#### By GCs
+
+:::{.panel-tabset .nav-pills}
+
+```{r}
+#| output: asis
+
+keep_gcs <- metadata |> 
+  dplyr::group_by(GC_NAME) |>
+  dplyr::summarise(
+    n = dplyr::n(),
+    .groups = "drop"
+  ) |>
+  dplyr::arrange(dplyr::desc(n)) |> 
+  dplyr::filter(n >= 10) |> 
+  dplyr::pull(GC_NAME)
+
+for (gc in keep_gcs) {
+  cat(sprintf("\n\n##### %s\n\n", gc))
+  plt <- ggwrappers::plot_pairs(
+    X[metadata$GC_NAME == gc, sort(colnames(X)), drop = FALSE], 
+    columns = 1:ncol(X),
+    point_size = 0.1
+  )
+  subchunkify(
+    plt, 
+    fig_height = length(features),
+    fig_width = length(features),
+    caption = sprintf(
+      "'Pairwise scatter plot of all chemical abundance features in %s GC (n = %d).'",
+      gc, sum(metadata$GC_NAME == gc)
+    )
+  )
+}
+```
+
+:::
+
+:::

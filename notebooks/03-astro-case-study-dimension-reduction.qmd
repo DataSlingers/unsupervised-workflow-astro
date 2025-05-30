@@ -1,0 +1,628 @@
+---
+title: "Finding Common Origins of Milky Way Stars"
+date: today
+author: "Andersen Chang, Tiffany M. Tang, Tarek M. Zikry, Genevera I. Allen"
+format:
+  html:
+    code-fold: true
+---
+
+```{r}
+#| include: false
+
+rm(list = ls())
+
+# source all functions from R/ folder
+for (fname in list.files(here::here("R"), pattern = "*.R")) {
+  source(here::here(file.path("R", fname)))
+}
+
+# helper paths
+DATA_PATH <- here::here("data")
+RESULTS_PATH <- here::here("results")
+if (!file.exists(RESULTS_PATH)) {
+  dir.create(RESULTS_PATH, recursive = TRUE)
+}
+
+# helpers for quarto plotting
+subchunkify <- purrr::partial(subchunkify, prefix = "dr")
+subchunk_idx <- 1  # for subchunk numbering
+
+# load in data
+load(file.path(DATA_PATH, "astro_cleaned_data.RData"))
+# get training data (using mean-imputed)
+feature_modes <- list("small" = 7, "medium" = 11, "big" = 19)
+train_data_ls <- purrr::map(
+  feature_modes,
+  ~ get_abundance_data(data_mean_imputed$train, feature_mode = .x)
+)
+
+set.seed(12345)
+```
+
+## Dimension Reduction
+
+```{r}
+#| code-summary: "Show Code to Fit Dimension Reduction Methods"
+
+## this code chunk fits the dimension reduction methods
+
+# select dimension reduction hyperparameter grids
+TSNE_PERPLEXITIES <- c(10, 30, 60, 100, 300)
+UMAP_N_NEIGHBORS <- c(10, 30, 60, 100, 300)
+
+# select dimension reduction methods
+dr_fun_ls <- c(
+  list("PCA" = fit_pca),
+  purrr::map(
+    TSNE_PERPLEXITIES,
+    ~ purrr::partial(fit_tsne, dims = 2, perplexity = .x)
+  ) |> 
+    setNames(sprintf("tSNE (perplexity = %d)", TSNE_PERPLEXITIES)),
+  purrr::map(
+    UMAP_N_NEIGHBORS,
+    ~ purrr::partial(fit_umap, dims = 2, n_neighbors = .x
+    )
+  ) |> 
+    setNames(sprintf("UMAP (n_neighbors = %d)", UMAP_N_NEIGHBORS))
+)
+
+fit_results_fname <- file.path(RESULTS_PATH, "dimension_reduction_fits.rds")
+if (!file.exists(fit_results_fname)) {
+  # fit dimension reduction methods (if not already cached)
+  dr_fit_ls <- purrr::map(
+    train_data_ls,
+    function(train_data) {
+      purrr::map(dr_fun_ls, function(dr_fun) dr_fun(train_data))
+    }
+  )
+  # save dimension reduction fits
+  saveRDS(dr_fit_ls, file = fit_results_fname)
+} else {
+  # read in dimension reduction fits (if already cached)
+  dr_fit_ls <- readRDS(fit_results_fname)
+}
+
+# aggregate all dimension reduction results into one df
+plt_df <- purrr::list_flatten(dr_fit_ls, name_spec = "{inner} [{outer}]") |> 
+  purrr::map(
+    ~ .x$scores[, 1:2] |> 
+      setNames(sprintf("Component %d", 1:2)) |> 
+      dplyr::bind_cols(
+        metadata$train |> dplyr::select(GC_NAME, GLAT, GLON)
+      ) |> 
+      dplyr::mutate(
+        id = 1:dplyr::n()
+      )
+  ) |> 
+  dr_results_to_df()
+```
+
+```{r}
+#| code-summary: "Show Code to Tune/Evaluate Dimension Reduction Methods"
+
+## this code chunk evaluates the dimension reduction methods
+
+# evaluate neighborhood retention metric
+Ks <- c(1, 5, 10, 25, 50, 100, 200, 300)
+
+eval_results_fname <- file.path(RESULTS_PATH, "dimension_reduction_eval.rds")
+if (!file.exists(eval_results_fname)) {
+  # evaluate neighborhood retention (if not already cached)
+  dr_eval_ls <- purrr::imap(
+    dr_fit_ls,
+    function(dr_out, key) {
+      purrr::map(
+        dr_out, 
+        function(.x) {
+          eval_neighborhood_retention(
+            orig_data = train_data_ls[[key]],
+            dr_data = .x$scores[, 1:min(ncol(.x$scores), 4)],
+            ks = Ks
+          )
+        }
+      )
+    }
+  )
+  # save dimension reduction evaluation results
+  saveRDS(dr_eval_ls, file = eval_results_fname)
+} else {
+  # read in dimension reduction evaluation results (if already cached)
+  dr_eval_ls <- readRDS(eval_results_fname)
+}
+
+eval_plt_df <- purrr::list_flatten(
+  dr_eval_ls, name_spec = "{inner} [{outer}]"
+) |> 
+  dr_results_to_df()
+```
+
+### Hyperparameter Tuning via Neighborhood Retention
+
+UMAP always below tSNE (100)
+
+```{r}
+#| output: asis
+#| fig-height: 12
+#| fig-width: 10
+#| echo: false
+
+# plot neighborhood retention metric
+plt <- eval_plt_df |> 
+  ggplot2::ggplot() +
+  ggplot2::aes(
+    x = k, 
+    y = retention, 
+    color = dr_method_name,
+    linetype = dr_method_type_name,
+    group = dr_method_name
+  ) +
+  ggplot2::facet_wrap(
+    ~ feature_mode_name, ncol = 1, scales = "free_y", 
+    labeller = ggplot2::labeller(
+      .default = function(x) stringr::str_to_title(x)
+    )
+  ) +
+  ggplot2::geom_line() +
+  ggplot2::geom_point() +
+  ggplot2::labs(
+    x = "Number of Neighbors (k)", 
+    y = "Neighborhood Retention Rate",
+    color = "Dimension Reduction Method",
+    linetype = ""
+  ) +
+  vthemes::theme_vmodern()
+plotly::ggplotly(plt)
+```
+
+
+### Dimension Reduction Plots
+
+:::{.panel-tabset}
+
+#### By GC
+
+```{r}
+#| echo: false
+#| fig-height: 35
+#| fig-width: 10
+#| fig-cap: "Dimension reduction visualizations, colored by GC."
+
+# plot dimension reduction methods, colored by GC names
+plt <- plt_df |> 
+  ggplot2::ggplot() +
+  ggplot2::aes(
+    x = `Component 1`, y = `Component 2`, color = GC_NAME
+  ) +
+  ggplot2::geom_point(size = 0.5) +
+  ggplot2::facet_wrap(
+    ~ pipeline_name, scales = "free", ncol = 3,
+    labeller = ggplot2::labeller(
+      .default = function(x) stringr::str_replace(x, " \\[", "\n\\[")
+    )
+  ) +
+  vthemes::theme_vmodern(
+    strip.text = ggplot2::element_text(
+      size = 8, margin = ggplot2::margin(t = 5, b = 10)
+    ),
+    panel.spacing.y = ggplot2::unit(1, "lines")
+  )
+plotly::ggplotly(plt) |> 
+  plotly::layout(margin = list(b = 40))
+```
+
+#### Galatic Coordinates by Component 1
+
+```{r}
+#| echo: false
+#| fig-height: 35
+#| fig-width: 10
+#| fig-cap: "Galactic coordinates plot (jittered), colored by value of the first component from dimension reduction method."
+
+# plot stars in galactic coordinate space, colored by component 1 value
+plt <- plt_df |> 
+  dplyr::group_by(pipeline_name) |> 
+  dplyr::mutate(
+    # standardize components across methods
+    dplyr::across(c(`Component 1`, `Component 2`), ~ scale(.x))
+  ) |> 
+  ggplot2::ggplot() +
+  ggplot2::aes(
+    x = GLON, y = GLAT, color = `Component 1`, label = GC_NAME
+  ) +
+  ggplot2::geom_jitter(size = 0.1, width = 10, height = 5) +
+  ggplot2::facet_wrap(
+    ~ pipeline_name, scales = "free", ncol = 3,
+    labeller = ggplot2::labeller(
+      .default = function(x) stringr::str_replace(x, " \\[", "\n\\[")
+    )
+  ) +
+  ggplot2::labs(
+    x = "Galactic Longitude",
+    y = "Galactic Latitude"
+  ) +
+  vthemes::scale_color_vmodern(discrete = FALSE) +
+  vthemes::theme_vmodern(
+    strip_text_size = 8
+  )
+plt
+```
+
+#### Galatic Coordinates by Component 2
+
+```{r}
+#| echo: false
+#| fig-height: 35
+#| fig-width: 10
+#| fig-cap: "Galactic coordinates plot (jittered), colored by value of the second component from dimension reduction method."
+
+# plot stars in galactic coordinate space, colored by component 2 value
+plt <- plt_df |> 
+  dplyr::group_by(pipeline_name) |> 
+  dplyr::mutate(
+    # standardize components across methods
+    dplyr::across(c(`Component 1`, `Component 2`), ~ scale(.x))
+  ) |> 
+  ggplot2::ggplot() +
+  ggplot2::aes(
+    x = GLON, y = GLAT, color = `Component 2`, label = GC_NAME
+  ) +
+  ggplot2::geom_jitter(size = 0.1, width = 10, height = 5) +
+  ggplot2::facet_wrap(
+    ~ pipeline_name, scales = "free", ncol = 3,
+    labeller = ggplot2::labeller(
+      .default = function(x) stringr::str_replace(x, " \\[", "\n\\[")
+    )
+  ) +
+  ggplot2::labs(
+    x = "Galactic Longitude",
+    y = "Galactic Latitude"
+  ) +
+  vthemes::scale_color_vmodern(discrete = FALSE) +
+  vthemes::theme_vmodern(
+    strip_text_size = 8
+  )
+plt
+```
+
+#### PC Directions
+
+```{r}
+#| echo: false
+#| fig-cap: "Principal Component Loadings"
+
+# plot PC loadings
+pc_loadings <- purrr::map(
+  dr_fit_ls,
+  ~ .x$PCA$loadings |> 
+    tibble::rownames_to_column("Feature") |>
+    dplyr::select(Feature, PC1:PC2)
+) |> 
+  dplyr::bind_rows(.id = "Mode") |> 
+  dplyr::mutate(
+    Mode = factor(
+      stringr::str_to_title(Mode),
+      levels = c("Small", "Medium", "Big")
+    )
+  )
+feature_order <- pc_loadings |> 
+  dplyr::arrange(Mode, dplyr::desc(abs(PC1))) |> 
+  dplyr::pull(Feature) |> 
+  unique()
+plt <- pc_loadings |> 
+  tidyr::pivot_longer(
+    cols = c(PC1:PC2),
+    names_to = "Component",
+    values_to = "Value"
+  ) |>
+  dplyr::mutate(
+    abs_value = abs(Value),
+    Value = sprintf("%.2f", Value),
+    Feature = factor(Feature, levels = rev(feature_order))
+  ) |> 
+  ggplot2::ggplot() +
+  ggplot2::aes(
+    x = Mode, y = Feature, fill = abs_value, label = Value
+  ) +
+  ggplot2::facet_grid(~ Component) +
+  ggplot2::geom_tile() +
+  ggplot2::geom_text() +
+  ggplot2::coord_cartesian(expand = FALSE) +
+  ggplot2::labs(x = "Feature Mode", fill = "|PC Loading|") +
+  vthemes::scale_fill_vmodern(discrete = FALSE) +
+  vthemes::theme_vmodern(size_preset = "medium")
+plt
+```
+
+:::
+
+```{r}
+#| include: false
+
+knitr::knit_exit()
+```
+
+### Stabiliy of Dimension Reduction across Pipelines
+
+The remainder of this notebook investigates the similarity of the dimension reduction outputs across different choices of dimension reduction methods and data preprocessing pipelines.
+However, since this section can take a while to run/render, we exit the notebook prior to rendering this section but leave the code here for interested readers.
+To render this section, remove the `knitr::knit_exit()` line above.
+
+:::{.panel-tabset}
+
+#### Across DR Methods
+
+Investigating the similarity of the dimension reduction outputs across dimension reduction methods...
+
+:::{.panel-tabset .nav-pills}
+
+```{r}
+#| output: asis
+#| echo: false
+
+main_dr_methods <- c(
+  "PCA", 
+  "tSNE \\(perplexity = 30\\)", 
+  "tSNE \\(perplexity = 100\\)", 
+  "UMAP \\(n_neighbors = 60\\)"
+)
+fig_height <- 10
+fig_width <- 10
+
+# for each feature mode (big/medium/small)
+for (feature_mode in names(train_data_ls)) {
+  cat(sprintf("\n\n#### %s\n\n", stringr::str_to_title(feature_mode)))
+  
+  # compare DR results across PCA/tSNE/UMAP
+  cat(sprintf("\n\n##### Across Select Methods\n\n"))
+  cur_plt_df <- plt_df |> 
+    dplyr::filter(stringr::str_detect(pipeline_name, !!feature_mode)) |> 
+    dplyr::mutate(
+      keep_method = purrr::map_lgl(
+        pipeline_name,
+        ~ any(stringr::str_detect(.x, main_dr_methods))
+      )
+    ) |> 
+    dplyr::filter(keep_method) |>
+    tidyr::pivot_longer(
+      cols = c(`Component 1`, `Component 2`),
+      names_to = "Component",
+      values_to = "Value"
+    ) |> 
+    dplyr::mutate(
+      pipeline_name = stringr::str_replace(pipeline_name, " \\[", "\n\\["),
+    ) |> 
+    tidyr::pivot_wider(
+      id_cols = c(id, GC_NAME),
+      names_from = c(pipeline_name, Component),
+      values_from = Value,
+      names_sep = "\n"
+    )
+  plt <- ggwrappers::plot_pairs(
+    cur_plt_df, 
+    columns = 3:ncol(cur_plt_df), 
+    # color_lower = cur_plt_df$GC_NAME,
+    # show_upper = FALSE,
+    point_size = 0.01
+  )
+  subchunkify(
+    plt, fig_height = fig_height, fig_width = fig_width
+  )
+  
+  # compare DR results across tSNE params
+  cat(sprintf("\n\n##### Across tSNE Parameters\n\n"))
+  cur_plt_df <- plt_df |> 
+    dplyr::filter(
+      stringr::str_detect(pipeline_name, !!feature_mode),
+      stringr::str_detect(pipeline_name, "tSNE")
+    ) |> 
+    tidyr::pivot_longer(
+      cols = c(`Component 1`, `Component 2`),
+      names_to = "Component",
+      values_to = "Value"
+    ) |> 
+    tidyr::pivot_wider(
+      id_cols = c(id, GC_NAME),
+      names_from = c(pipeline_name, Component),
+      values_from = Value,
+      names_sep = "\n"
+    )
+  plt <- ggwrappers::plot_pairs(
+    cur_plt_df, 
+    columns = 3:ncol(cur_plt_df), 
+    # color_lower = cur_plt_df$GC_NAME,
+    # show_upper = FALSE,
+    point_size = 0.01
+  )
+  subchunkify(
+    plt, fig_height = fig_height, fig_width = fig_width
+  )
+  
+  # compare DR results across UMAP params
+  cat(sprintf("\n\n##### Across UMAP Parameters\n\n"))
+  cur_plt_df <- plt_df |> 
+    dplyr::filter(
+      stringr::str_detect(pipeline_name, !!feature_mode),
+      stringr::str_detect(pipeline_name, "UMAP")
+    ) |> 
+    tidyr::pivot_longer(
+      cols = c(`Component 1`, `Component 2`),
+      names_to = "Component",
+      values_to = "Value"
+    ) |> 
+    tidyr::pivot_wider(
+      id_cols = c(id, GC_NAME),
+      names_from = c(pipeline_name, Component),
+      values_from = Value,
+      names_sep = "\n"
+    )
+  plt <- ggwrappers::plot_pairs(
+    cur_plt_df, 
+    columns = 3:ncol(cur_plt_df), 
+    # color_lower = cur_plt_df$GC_NAME,
+    # show_upper = FALSE,
+    point_size = 0.01
+  )
+  subchunkify(
+    plt, fig_height = fig_height, fig_width = fig_width
+  )
+}
+```
+
+:::
+
+#### Across Feature Inputs
+
+Investigating the similarity of the dimension reduction outputs across different choices of the feature sets used as input into the dimension reduction methods...
+
+:::{.panel-tabset .nav-pills}
+
+```{r}
+#| output: asis
+#| echo: false
+
+# for each dimension reduction method, compare across big/medium/small fits
+for (method_name in names(dr_fun_ls)) {
+  cat(sprintf("\n\n#### %s\n\n", stringr::str_to_title(method_name)))
+  method_name <- stringr::str_replace_all(method_name, "\\(", "\\\\(") |> 
+    stringr::str_replace_all("\\)", "\\\\)")
+  cur_plt_df <- plt_df |> 
+    dplyr::filter(stringr::str_detect(pipeline_name, !!method_name)) |> 
+    tidyr::pivot_longer(
+      cols = c(`Component 1`, `Component 2`),
+      names_to = "Component",
+      values_to = "Value"
+    ) |> 
+    tidyr::pivot_wider(
+      id_cols = c(id, GC_NAME),
+      names_from = c(pipeline_name, Component),
+      values_from = Value,
+      names_sep = "\n"
+    ) 
+  plt <- ggwrappers::plot_pairs(
+    cur_plt_df, 
+    columns = 3:ncol(cur_plt_df), 
+    # color_lower = cur_plt_df$GC_NAME,
+    # show_upper = FALSE,
+    point_size = 0.01
+  )
+  subchunkify(
+    plt, fig_height = fig_height, fig_width = fig_width
+  )
+}
+```
+
+:::
+
+#### Stability of Nearest Neighbors
+
+Investigating the similarity of the dimension reduction outputs, in terms of their nearest neighbor graphs, across different dimension reduction method pipelines...
+
+:::{.panel-tabset .nav-pills}
+
+```{r}
+#| output: asis
+#| echo: false
+
+# compute nearest neighbor graphs for different ks
+ks_dr <- c(5, 10, 25)
+dr_data_ls <- purrr::list_flatten(dr_fit_ls, name_spec = "{inner} ({outer})")
+knn_graphs_ls <- purrr::map(
+  ks_dr,
+  function(k) {
+    purrr::map(
+      dr_data_ls,
+      function(dr_data) {
+        knn_graph <- FNN::get.knn(dr_data$scores[, 1:2], k = k)
+        W <- matrix(0, nrow(dr_data$scores), nrow(dr_data$scores))
+        for (i in 1:nrow(dr_data$scores)) {
+          W[i, knn_graph$nn.index[i, ]] <- 1
+        }
+        return(W)
+      }
+    )
+  }
+) |> 
+  setNames(sprintf("k = %d", ks_dr))
+
+wknn_graphs_ls <- purrr::map(
+  ks_dr,
+  function(k) {
+    purrr::map(
+      dr_data_ls,
+      function(dr_data) {
+        knn_graph <- FNN::get.knn(dr_data$scores[, 1:2], k = k)
+        W <- matrix(0, nrow(dr_data$scores), nrow(dr_data$scores))
+        for (i in 1:nrow(dr_data$scores)) {
+          W[i, knn_graph$nn.index[i, ]] <- 1
+        }
+        diag(W) <- 1
+        W <- 1/2 * (t(W) + W)
+        return(W)
+      }
+    )
+  }
+) |> 
+  setNames(sprintf("k = %d", ks_dr))
+
+# count number of co-neighbors across methods
+agg_knn_graphs_ls <- purrr::map(
+  knn_graphs_ls,
+  ~ purrr::reduce(.x, `+`)
+)
+agg_wknn_graphs_ls <- purrr::map(
+  wknn_graphs_ls,
+  ~ purrr::reduce(.x, `+`)
+)
+
+# plot heatmap of co-neighbor frequencies
+gc_levels <- metadata$train |> 
+  dplyr::group_by(GC_NAME) |> 
+  dplyr::summarise(
+    n = dplyr::n(),
+    .groups = "drop"
+  ) |>
+  dplyr::arrange(dplyr::desc(n)) |>
+  dplyr::pull(GC_NAME)
+custom_colors <- c(
+  "black",
+  # "white",
+  viridisLite::viridis(
+    n = length(dr_data_ls) - 1, begin = 0.2, end = 1, option = "A"
+  )
+)
+custom_values <- seq(0, length(dr_data_ls), by = 1)
+for (k in names(agg_knn_graphs_ls)) {
+  cat(sprintf("\n\n#### %s\n\n", k))
+  plt_df <- as.data.frame(agg_wknn_graphs_ls[[k]])
+  # sample_idx <- sample(1:nrow(plt_df), size = 200, replace = FALSE)
+  plt <- ggwrappers::plot_hclust_heatmap(
+    X = plt_df,
+    y_groups = factor(metadata$train$GC_NAME, levels = gc_levels),
+    x_groups = factor(metadata$train$GC_NAME, levels = gc_levels),
+    # X = plt_df[sample_idx, sample_idx],
+    # y_groups = factor(metadata$train$GC_NAME, levels = gc_levels)[sample_idx],
+    # x_groups = factor(metadata$train$GC_NAME, levels = gc_levels)[sample_idx],
+    show_ytext = FALSE,
+    show_xtext = FALSE
+  ) +
+    ggplot2::scale_fill_gradientn(
+      colors = custom_colors, values = scales::rescale(custom_values)
+    ) +
+    ggplot2::labs(x = "Star", y = "Star", fill = "Co-neighbor\nFrequency") +
+    ggplot2::theme(
+      panel.spacing = grid::unit(.02, "lines"),
+      panel.border = ggplot2::element_rect(
+        color = "black", fill = NA, linewidth = 0
+      )
+    )
+  subchunkify(
+    plt, fig_height = 20, fig_width = 20,
+  )
+}
+```
+
+:::
+
+:::
+

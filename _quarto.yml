@@ -1,0 +1,47 @@
+project:
+  type: website
+  output-dir: docs/
+  render:
+    - index.qmd
+    - notebooks/01-astro-case-study-data.qmd
+    - notebooks/02-astro-case-study-eda.qmd
+    - notebooks/03-astro-case-study-dimension-reduction.qmd
+    - notebooks/04-astro-case-study-clustering-train.qmd
+    - notebooks/05-astro-case-study-clustering-validation.qmd
+    - notebooks/06-astro-case-study-clustering-interpretation.qmd
+
+website:
+  page-navigation: true
+  sidebar:
+    style: "docked"
+    contents:
+      - href: index.qmd
+        text: 1 Introduction
+      - href: notebooks/01-astro-case-study-data.qmd
+        text: 2 Data
+      - href: notebooks/02-astro-case-study-eda.qmd
+        text: 3 Exploratory Data Analysis
+      - href: notebooks/03-astro-case-study-dimension-reduction.qmd
+        text: 4 Dimension Reduction
+      - href: notebooks/04-astro-case-study-clustering-train.qmd
+        text: 5 Clustering (train)
+      - href: notebooks/05-astro-case-study-clustering-validation.qmd
+        text: 6 Clustering (validation)
+      - href: notebooks/06-astro-case-study-clustering-interpretation.qmd
+        text: 7 Intepreting Final Clusters
+
+format:
+  html:
+    theme: sandstone
+    css: css/custom_style.css
+    toc: true
+    lightbox: true
+    code-summary: "Show Code"
+    code-fold: true
+    embed-resources: false
+
+bibliography: references.bib
+
+execute:
+  warning: false
+  message: false
