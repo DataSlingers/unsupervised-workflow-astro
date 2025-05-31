@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Andersen Chang^*, Tiffany M. Tang^*, Tarek M. Zikry^*, Genevera I. Allen">
-<meta name="dcterms.date" content="2025-05-30">
+<meta name="dcterms.date" content="2025-05-31">
 
 <title>Finding Common Origins of Milky Way Stars</title>
 <style>
@@ -56,7 +56,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -255,7 +275,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 30, 2025</p>
+      <p class="date">May 31, 2025</p>
     </div>
   </div>
   
@@ -269,7 +289,7 @@ window.Quarto = {
 
 <section id="loading-cleaning-and-splitting-data" class="level2">
 <h2 class="anchored" data-anchor-id="loading-cleaning-and-splitting-data">Loading, Cleaning, and Splitting Data</h2>
-<p>Let us begin by loading in the APOGEE DR17 data, which was originally downloaded from <a href="https://www.sdss4.org/dr17/irspec/spectro_data/">SDSS</a> (or direct download link <a href="https://data.sdss.org/sas/dr17/apogee/spectro/aspcap/dr17/synspec_rev1/allStar-dr17-synspec_rev1.fits">here</a>).</p>
+<p>Let us begin by loading in the APOGEE DR17 data, which was originally downloaded from <a href="https://www.sdss4.org/dr17/irspec/spectro_data/">SDSS</a> (or direct download link <a href="https://data.sdss.org/sas/dr17/apogee/spectro/aspcap/dr17/synspec_rev1/allStar-dr17-synspec_rev1.fits">here</a>). A detailed data dictionary can be found <a href="https://data.sdss.org/datamodel/files/APOGEE_ASPCAP/APRED_VERS/ASPCAP_VERS/allStar.html">here</a>.</p>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Show Code</summary>
@@ -277,9 +297,16 @@ window.Quarto = {
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data_orig <span class="ot">&lt;-</span> <span class="fu">load_astro_data</span>(<span class="at">data_dir =</span> DATA_PATH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>This data contains both the chemical abundance data and metadata about the quality control and star properties.</p>
-<p>A detailed data dictionary can be found <a href="https://data.sdss.org/datamodel/files/APOGEE_ASPCAP/APRED_VERS/ASPCAP_VERS/allStar.html">here</a>.</p>
-<p>Next, performing some basic quality control filtering. (Need to explain, justify, and elaborate on this step).</p>
+<p>This data contains the chemical abundances from 19 different elements as well as metadata about the quality control and star properties. Here, we have also supplemented the data with the APOGEE DR17 value-added catalog of globular clusters (GCs) <span class="citation" data-cites="schiavon2024apogee">(<a href="#ref-schiavon2024apogee" role="doc-biblioref">Schiavon et al. 2024</a>)</span>. GCs are sites of dense star formation, comprised of <span class="math inline">\(10^5 - 10^7\)</span> stars that were roughly formed around the same time. GCs hence provide a convenient starting point for understanding and assessing the chemical origins of stars in the Milky Way. Nonetheless, this is only a starting point — we note that many stars in the APOGEE survey have been assigned to GCs based on proximity while there is also the broader open question of discovering deeper shared origins of possibly distant bodies.</p>
+<p>We next perform some basic quality control filtering. Specifically, following previous literature <span class="citation" data-cites="pagnini2025abundance">(<a href="#ref-pagnini2025abundance" role="doc-biblioref">Pagnini et al. 2025</a>)</span>, we subset the stars to those that meet the criteria below:</p>
+<ul>
+<li>Signal-to-noise (S/N) ratio threshold greater than 70</li>
+<li>Effective temperature <span class="math inline">\(T_{eff}\)</span> ranges between 3500 and 5500</li>
+<li>Logarithm of the surface gravity <span class="math inline">\(\log g\)</span> less than 3.6</li>
+<li>GC membership probability greater than 0.9</li>
+<li>STARFLAG parameter (indicating poor quality measurements) is set to 0</li>
+</ul>
+<p>This quality control filtering resulted in a sample of 3,286 observations (or stars). We will investigate alternative, but equally-reasonable quality control filtering choices in a future section.</p>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Show Code</summary>
@@ -302,7 +329,7 @@ window.Quarto = {
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Quick overview of the data after QC filtering…</p>
+<p>Below, we provide a quick overview of the data after quality control filtering.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Abundance Data</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Metadata</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">GC Frequency Table</a></li></ul>
 <div class="tab-content">
@@ -919,7 +946,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>Before proceeding any further, we will split data into training and test using 80-20% split.</p>
+<p>Before proceeding any further, we randomly split the data into training and test using an 80-20% split. This led to a training set of 2,628 observations and a test set of 658 observations.</p>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Show Code</summary>
@@ -937,7 +964,7 @@ window.Quarto = {
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>test_metadata <span class="ot">&lt;-</span> data_qc_filtered<span class="sc">$</span>meta[<span class="sc">-</span>train_idxs, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Now imputing missing values and standardizing the data. We will try imputing using mean and random forest imputation.</p>
+<p>We next impute missing abundance values in the data and standardize each elemental abundance feature to have mean 0 and standard deviation 1. Given that there are various ways to perform missing data imputation, we implement two different imputation methods: (1) mean imputation and (2) random forest imputation using MissForest <span class="citation" data-cites="stekhoven2012missforest">(<a href="#ref-stekhoven2012missforest" role="doc-biblioref">Stekhoven and Bühlmann 2012</a>)</span>.</p>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Show Code</summary>
@@ -972,9 +999,20 @@ window.Quarto = {
 </div>
 
 
+
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-pagnini2025abundance" class="csl-entry" role="listitem">
+Pagnini, Giulia, Paola Di Matteo, Misha Haywood, Alessandra Mastrobuono-Battisti, Florent Renaud, Maëlie Mondelin, Oscar Agertz, et al. 2025. <span>“Abundance Ties: Nephele and the Globular Cluster Population Accreted with <span class="math inline">\(\omega\)</span> Cen-Based on APOGEE DR17 and Gaia EDR3.”</span> <em>Astronomy &amp; Astrophysics</em> 693: A155.
+</div>
+<div id="ref-schiavon2024apogee" class="csl-entry" role="listitem">
+Schiavon, Ricardo P, Siân G Phillips, Natalie Myers, Danny Horta, Dante Minniti, Carlos Allende Prieto, Borja Anguiano, et al. 2024. <span>“The APOGEE Value-Added Catalogue of Galactic Globular Cluster Stars.”</span> <em>Monthly Notices of the Royal Astronomical Society</em> 528 (2): 1393–1407.
+</div>
+<div id="ref-stekhoven2012missforest" class="csl-entry" role="listitem">
+Stekhoven, Daniel J, and Peter Bühlmann. 2012. <span>“MissForest—Non-Parametric Missing Value Imputation for Mixed-Type Data.”</span> <em>Bioinformatics</em> 28 (1): 112–18.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
