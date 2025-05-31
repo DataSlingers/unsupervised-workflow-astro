@@ -11,11 +11,11 @@ The emergence of large spectroscopic surveys of the Milky Way has led to signifi
 In particular, researchers are often interested in understanding how stars were formed or evolved chemodynamically over large periods of time. 
 To this end, previous work has shown that in the process of forming a stellar body, parent molecular clouds can produce hundreds of stars in a single burst [@krumholz2014star], but due to astronomical dynamics, these shared origins are challenging to find. 
 
-In this case study, we will leverage the Apache Point Observatory Galactic Evolution Experiment (APOGEE) DR17 [@prieto2008apogee], a large high-resolution spectroscopic survey of stars compring the disk (i.e., the primary area of the Milky Way's stellar mass), in order to identify groups of stars in the Milky Way with similar chemical properties and gain insights into the shared origins of stars that were formed together.
+In this case study, we will leverage the Apache Point Observatory Galactic Evolution Experiment (APOGEE) DR17 [@prieto2008apogee], a large high-resolution spectroscopic survey of stars comprising the disk (i.e., the primary area of the Milky Way's stellar mass), in order to identify groups of stars in the Milky Way with similar chemical properties and gain insights into the shared origins of stars that were formed together.
 
 ## Outline
 
-In what follows, we will walk through a typical unsupervised machine learning workflow for scientific discovery, namely, to identify common origins of stars in the Milky Way. To this end, we will proceed through the following steps:
+In what follows, we will walk through an unsupervised machine learning workflow for scientific discovery, namely, to discover common origins of stars in the Milky Way. To this end, we will proceed through the following steps:
 
 - [**Data Preparation and Cleaning**](./notebooks/01-astro-case-study-data.html):
 We begin by loading in the data, performing some basic quality control filtering and cleaning, and splitting the data into a training and test set.

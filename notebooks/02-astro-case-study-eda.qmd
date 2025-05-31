@@ -36,6 +36,9 @@ set.seed(12345)
 
 ## Exploratory Data Analysis
 
+In this section, we conduct a brief exploratory data analysis, visualizing the overall distributions of the chemical abundance data, the galactic coordinates of the stars, and pairwise relationships between the chemical abundance features.
+For simplicity, all plots shown here are based on the mean-imputed training data.
+
 ```{r}
 # get X (using mean-imputed) and metadata for EDA
 metadata <- metadata$train

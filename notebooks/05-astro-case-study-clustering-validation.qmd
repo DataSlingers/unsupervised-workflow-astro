@@ -46,7 +46,195 @@ best_clust_method_name <- "k = 8: K-means"
 best_k <- 8
 ```
 
+## Validation: Stability across Alternative Data Preprocessing
+
+To begin validating the obtained (consensus) clusters from K-means with $k = 8$ clusters, we assess the stability of the resulting clusters, had the same clustering pipeline been applied but with alternative data preprocessing choices.
+Importantly, we note that some data preprocessing choices (e.g., mean- versus RF-imputation, the set of chemical abundance features, and the dimension reduction method) have already been accounted for when performing the consensus clustering step discussed previously.
+However, due to the high computational burden, there are often more data preprocessing choices that are worth exploring than those that are feasible to include in the consensus step.
+For example, we have yet to investigate whether or not the resulting clusters are similar, had alternative quality control filtering thresholds been used.
+
+Below, we repeat the clustering pipeline on the training data, but with alternative quality control filtering thresholds. Specifically, we marginally sweep across the following parameters:
+
+- Signal-to-noise (S/N) ratio threshold = 30, 50, 70$^*$, 90, 110, 130, 150
+- Effective temperature $T_{eff}$ range width = 500, 1000$^*$, 1500, 2000
+- Logarithm of the surface gravity $\log g$ = 3.0, 3.3, 3.6$^*$, 3.9, 4.2
+- GC membership probability = 0.5, 0.7, 0.9$^*$, 0.99
+
+We denote the default QC thresholds (used in previously in the main analysis) with an astericks ($^*$).
+
+For each of these alternative choices, we compare the similarity between the original clusters and these new clusters using the adjusted Rand index (ARI). We report these results below.
+We find that the ARI at non-default filtering thresholds is both high and very similar to the ARI at the default filtering thresholds, indicating that the clusters are highly robust to these alternative data preprocessing choices.
+
+```{r}
+#| output: asis
+#| code-summary: "Show Code to Evaluate Cluster Stability Across Alternative Data Preprocessing Pipelines"
+
+# Default QC thresholds
+default_grid <- list(
+  snr = 70,
+  vb = 0.9,
+  logg = 3.6,
+  teff_width = 1000  # yields [3500, 5500]
+)
+
+# Parameter grids to sweep
+vary_param_grid <- list(
+  snr = c(30, 50, 70, 90, 110, 130, 150),
+  vb = c(0.5, 0.7, 0.9, 0.99),
+  logg = c(3.0, 3.3, 3.6, 3.9, 4.2),
+  teff_width = c(500, 1000, 1500, 2000)
+)
+
+# Load data
+data_mean_imputed_train <- dplyr::bind_cols(
+  metadata$train, data_mean_imputed$train
+)
+data_rf_imputed_train <- dplyr::bind_cols(
+  metadata$train, data_rf_imputed$train
+)
+
+# Get original cluster fit
+orig_clusters <- readRDS(
+  file.path(RESULTS_PATH, "consensus_clusters_train.rds")
+)[[best_clust_method_name]]$cluster_ids
+
+stability_results_fname <- file.path(
+  RESULTS_PATH, "clustering_fits_stability.rds"
+)
+
+if (!file.exists(stability_results_fname)) {
+  stability_fits_ls <- list()
+  for (param_name in names(vary_param_grid)) {
+    param_grid_ls <- default_grid
+    param_grid_ls[[param_name]] <- vary_param_grid[[param_name]]
+    param_grid <- expand.grid(param_grid_ls)
+    stability_fits_ls[[param_name]] <- purrr::map(
+      1:nrow(param_grid),
+      function(i) {
+        snr <- param_grid$snr[[i]]
+        vb <- param_grid$vb[[i]]
+        logg <- param_grid$logg[[i]]
+        teff_width <- param_grid$teff_width[[i]]
+        
+        # get new QC-filtered data
+        data_mean_imputed_qc <- apply_qc_filtering(
+          data_mean_imputed_train, 
+          snr_threshold = snr,
+          teff_thresholds = c(4500 - teff_width, 4500 + teff_width),
+          logg_threshold = logg,
+          starflag = 0,
+          vb_threshold = vb
+        )
+        data_rf_imputed_qc <- apply_qc_filtering(
+          data_rf_imputed_train, 
+          snr_threshold = snr,
+          teff_thresholds = c(4500 - teff_width, 4500 + teff_width),
+          logg_threshold = logg,
+          starflag = 0,
+          vb_threshold = vb
+        )
+        
+        # get sample ids for new QC-filtered data
+        keep_sample_idxs <- tibble::tibble(
+          APOGEE_ID = data_mean_imputed_qc$meta$APOGEE_ID
+        ) |> 
+          dplyr::left_join(
+            dplyr::bind_cols(.id = 1:nrow(metadata$train), metadata$train),
+            by = "APOGEE_ID"
+          ) |> 
+          dplyr::pull(.id)
+        
+        # fit clustering pipeline on new QC-filtered data
+        cluster_ids <- fit_best_pipeline(
+          data_ls = list(
+            "Mean-imputed" = data_mean_imputed_qc$abundance,
+            "RF-imputed" = data_rf_imputed_qc$abundance
+          ),
+          k = best_k
+        )
+        
+        # evaluate stability between original clusters and new clusters
+        stability <- mclust::adjustedRandIndex(
+          cluster_ids, orig_clusters[keep_sample_idxs]
+        )
+        
+        return(list(
+          sample_ids = keep_sample_idxs,
+          cluster_ids = cluster_ids,
+          stability = stability
+        ))
+      }
+    ) |> 
+      setNames(vary_param_grid[[param_name]])
+  }
+  saveRDS(stability_fits_ls, stability_results_fname)
+} else {
+  stability_fits_ls <- readRDS(stability_results_fname)
+}
+
+stability_results_ls <- purrr::imap(
+  stability_fits_ls,
+  function(x, key) {
+    purrr::map(x, ~ data.frame(stability = .x$stability)) |> 
+      dplyr::bind_rows(.id = key) |> 
+      dplyr::mutate(
+        {{key}} := as.numeric(.data[[key]])
+      )
+  }
+)
+
+plt_ls <- purrr::imap(
+  stability_results_ls,
+  function(stability_df, key) {
+    param_title <- dplyr::case_when(
+      key == "snr" ~ "SNR Threshold",
+      key == "vb" ~ "VB Threshold",
+      key == "logg" ~ "Log(g) Threshold",
+      key == "teff_width" ~ "Teff Width"
+    )
+    stability_df |> 
+      ggplot2::ggplot() +
+      ggplot2::aes(x = !!rlang::sym(key), y = stability) +
+      ggplot2::geom_line(width = 1.2, color = "steelblue") +
+      ggplot2::geom_point(width = 2.5, color = "steelblue") +
+      ggplot2::ylim(c(0, 1)) +
+      ggplot2::labs(
+        x = param_title,
+        y = "ARI Stability",
+      ) +
+      ggplot2::theme_minimal(base_size = 14) +
+      ggplot2::theme(
+        panel.grid.major = ggplot2::element_line(color = "grey80"),
+        panel.grid.minor = ggplot2::element_blank(),
+        axis.title.y.left = ggplot2::element_text(color = "steelblue")
+      )
+  }
+)
+
+plt <- patchwork::wrap_plots(plt_ls, nrow = 1) +
+  patchwork::plot_layout(axes = "collect")
+subchunkify(
+  plt, fig_height = 4, fig_width = 10,
+  caption = "'Stability of cluster labels across different choices of data preprocessing pipelines.'"
+)
+```
+
+
 ## Validation: Cluster Generalizability
+
+We next assess the overall generalizability of our estimated clusters using the held-out test set and the idea of cluster predictability.
+Specifically, we (i) apply the same consensus K-means with $k = 8$ clustering pipeline to the training and test data separately, (ii) fit a random forest (RF) using the training covariates data to predict the cluster labels on the training set, (iii) use this trained RF to predict the cluster labels on the test set, and (iv) evaluate the concordance (via ARI) between the test cluster labels and the RF-predicted cluster labels on the test set.
+Note that this procedure relies on some preprocessed version of the covariates (i.e., abundance) data, and we thus report the generalizability using various data preprocessing pipelines below.
+In general, the choice of data preprocessing does not substantially impact the overall cluster generalizability, which is consistently between 0.39-0.43 ARI.
+
+Though this ARI is not particularly high, there are select clusters that are far more generalizable than others. 
+This can be seen by examining the confusion tables below (under the `Confusion Tables` tab).
+For example, the cluster labeled "Predicted 8" (i.e., cluster 8 from the training data) is highly generalizable and directly maps to cluster 7 in the test data.
+On the other hand, the cluster labeled "Predicted 3" (i.e., cluster 3 from the training data) is often confused with test clusters 2, 3 and 4.
+
+To more rigorously quantify this cluster-specific notion of generalizability, we define a local generalizability metric, computed as the precision (i.e., TP/(TP + FP)) of each cluster.
+(Note: since the cluster labels are arbitrary, we align the RF-predicted clusters and the estimated test clusters based upon the pairing with the largest overlap and report the precision given that mapping.)
+These local generalizability scores clearly indicate that clusters 1, 2, 6, and 8 from the training dataset are highly predictable and generalizable while other clusters such as cluster 3 are less generalizable.
 
 ```{r}
 #| code-summary: "Show Code to Evaluate Cluster Generalizability using Test Data"
@@ -313,7 +501,7 @@ vthemes::pretty_DT(
   options = list(dom = "t")
 ) |> 
   subchunkify(
-    caption = "'Local generalizability, computed as the largest overlap between the predicted clusters and the estimated test clusters divided by the number of samples in the predicted cluster.'"
+    caption = "'Local generalizability, defined as the precision for each cluster (after appropriately aligning the cluster labels).'"
   )
 
 cat(sprintf("\n\n### Confusion Tables\n\n"))
@@ -335,162 +523,3 @@ cat("\n\n:::\n\n")
 ```
 
 :::
-
-## Validation: Stability across Alternative Data Preprocessing
-
-```{r}
-#| output: asis
-#| code-summary: "Show Code to Evaluate Cluster Stability Across Alternative Data Preprocessing Pipelines"
-
-# Default QC thresholds
-default_grid <- list(
-  snr = 70,
-  vb = 0.9,
-  logg = 3.6,
-  teff_width = 1000  # yields [3500, 5500]
-)
-
-# Parameter grids to sweep
-vary_param_grid <- list(
-  snr = c(30, 50, 70, 90, 110, 130, 150),
-  vb = c(0.5, 0.7, 0.9, 0.99),
-  logg = c(3.0, 3.3, 3.6, 3.9, 4.2),
-  teff_width = c(500, 1000, 1500, 2000)
-)
-
-# Load data
-data_mean_imputed_train <- dplyr::bind_cols(
-  metadata$train, data_mean_imputed$train
-)
-data_rf_imputed_train <- dplyr::bind_cols(
-  metadata$train, data_rf_imputed$train
-)
-
-# Get original cluster fit
-orig_clusters <- readRDS(
-  file.path(RESULTS_PATH, "consensus_clusters_train.rds")
-)[[best_clust_method_name]]$cluster_ids
-
-stability_results_fname <- file.path(
-  RESULTS_PATH, "clustering_fits_stability.rds"
-)
-
-if (!file.exists(stability_results_fname)) {
-  stability_fits_ls <- list()
-  for (param_name in names(vary_param_grid)) {
-    param_grid_ls <- default_grid
-    param_grid_ls[[param_name]] <- vary_param_grid[[param_name]]
-    param_grid <- expand.grid(param_grid_ls)
-    stability_fits_ls[[param_name]] <- purrr::map(
-      1:nrow(param_grid),
-      function(i) {
-        snr <- param_grid$snr[[i]]
-        vb <- param_grid$vb[[i]]
-        logg <- param_grid$logg[[i]]
-        teff_width <- param_grid$teff_width[[i]]
-        
-        # get new QC-filtered data
-        data_mean_imputed_qc <- apply_qc_filtering(
-          data_mean_imputed_train, 
-          snr_threshold = snr,
-          teff_thresholds = c(4500 - teff_width, 4500 + teff_width),
-          logg_threshold = logg,
-          starflag = 0,
-          vb_threshold = vb
-        )
-        data_rf_imputed_qc <- apply_qc_filtering(
-          data_rf_imputed_train, 
-          snr_threshold = snr,
-          teff_thresholds = c(4500 - teff_width, 4500 + teff_width),
-          logg_threshold = logg,
-          starflag = 0,
-          vb_threshold = vb
-        )
-        
-        # get sample ids for new QC-filtered data
-        keep_sample_idxs <- tibble::tibble(
-          APOGEE_ID = data_mean_imputed_qc$meta$APOGEE_ID
-        ) |> 
-          dplyr::left_join(
-            dplyr::bind_cols(.id = 1:nrow(metadata$train), metadata$train),
-            by = "APOGEE_ID"
-          ) |> 
-          dplyr::pull(.id)
-        
-        # fit clustering pipeline on new QC-filtered data
-        cluster_ids <- fit_best_pipeline(
-          data_ls = list(
-            "Mean-imputed" = data_mean_imputed_qc$abundance,
-            "RF-imputed" = data_rf_imputed_qc$abundance
-          ),
-          k = best_k
-        )
-        
-        # evaluate stability between original clusters and new clusters
-        stability <- mclust::adjustedRandIndex(
-          cluster_ids, orig_clusters[keep_sample_idxs]
-        )
-        
-        return(list(
-          sample_ids = keep_sample_idxs,
-          cluster_ids = cluster_ids,
-          stability = stability
-        ))
-      }
-    ) |> 
-      setNames(vary_param_grid[[param_name]])
-  }
-  saveRDS(stability_fits_ls, stability_results_fname)
-} else {
-  stability_fits_ls <- readRDS(stability_results_fname)
-}
-
-stability_results_ls <- purrr::imap(
-  stability_fits_ls,
-  function(x, key) {
-    purrr::map(x, ~ data.frame(stability = .x$stability)) |> 
-      dplyr::bind_rows(.id = key) |> 
-      dplyr::mutate(
-        {{key}} := as.numeric(.data[[key]])
-      )
-  }
-)
-
-plt_ls <- purrr::imap(
-  stability_results_ls,
-  function(stability_df, key) {
-    param_title <- dplyr::case_when(
-      key == "snr" ~ "SNR Threshold",
-      key == "vb" ~ "VB Threshold",
-      key == "logg" ~ "Log(g) Threshold",
-      key == "teff_width" ~ "Teff Width"
-    )
-    stability_df |> 
-      ggplot2::ggplot() +
-      ggplot2::aes(x = !!rlang::sym(key), y = stability) +
-      ggplot2::geom_line(width = 1.2, color = "steelblue") +
-      ggplot2::geom_point(width = 2.5, color = "steelblue") +
-      ggplot2::ylim(c(0, 1)) +
-      ggplot2::labs(
-        x = param_title,
-        y = "ARI Stability",
-      ) +
-      ggplot2::theme_minimal(base_size = 14) +
-      ggplot2::theme(
-        panel.grid.major = ggplot2::element_line(color = "grey80"),
-        panel.grid.minor = ggplot2::element_blank(),
-        axis.title.y.left = ggplot2::element_text(color = "steelblue")
-      )
-  }
-)
-
-plt <- patchwork::wrap_plots(plt_ls, nrow = 1) +
-  patchwork::plot_layout(axes = "collect")
-subchunkify(
-  plt, fig_height = 4, fig_width = 10,
-  caption = "'Stability of cluster labels across different choices of data preprocessing pipelines.'"
-)
-```
-
-
-

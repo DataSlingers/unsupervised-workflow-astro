@@ -48,6 +48,8 @@ best_pipe_name <- "k = 8: K-means"
 
 ## Fit Tuned Clustering Pipeline(s) on Full Data
 
+We lastly re-fit the consensus K-means ($k = 8$) clustering pipeline on the full training and test data together to obtain the final clusters.
+
 ```{r}
 #| code-summary: "Show Code to Fit Final (tuned) Clustering Pipeline on Full Data"
 
@@ -195,6 +197,15 @@ if (!file.exists(fit_results_fname) ||
 ```
 
 ## Interpreting the Final Clusters
+
+Below, we show:
+
+- Consensus neighborhood heatmap, showing the proportion of times each pair of stars were clustered together across the different choices of data preprocessing pipelines
+- GC composition for each estimated cluster, illuminating several GCs that are fully contained within a single cluster, e.g., NGC6121 (dark green bar) in cluster 1 and NGC0104 (orange bar) in cluster 2
+- Local stability values for each star, providing a more granular measure of how consistently each star is clustered together across the different data preprocessing pipelines
+- Distribution of abundances per estimated cluster, revealing distinctive chemical properties of each cluster (e.g., cluster 2 is iron-rich)
+
+For additional discussion of these clustering results, we refer interested readers to the [main text]().
 
 :::{.panel-tabset}
 

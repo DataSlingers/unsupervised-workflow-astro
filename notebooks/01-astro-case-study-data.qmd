@@ -34,17 +34,29 @@ set.seed(12345)
 ## Loading, Cleaning, and Splitting Data
 
 Let us begin by loading in the APOGEE DR17 data, which was originally downloaded from [SDSS](https://www.sdss4.org/dr17/irspec/spectro_data/) (or direct download link [here](https://data.sdss.org/sas/dr17/apogee/spectro/aspcap/dr17/synspec_rev1/allStar-dr17-synspec_rev1.fits)).
+A detailed data dictionary can be found [here](https://data.sdss.org/datamodel/files/APOGEE_ASPCAP/APRED_VERS/ASPCAP_VERS/allStar.html).
 
 ```{r}
 # Load data
 data_orig <- load_astro_data(data_dir = DATA_PATH)
 ```
 
-This data contains both the chemical abundance data and metadata about the quality control and star properties.
+This data contains the chemical abundances from 19 different elements as well as metadata about the quality control and star properties. 
+Here, we have also supplemented the data with the APOGEE DR17 value-added catalog of globular clusters (GCs) [@schiavon2024apogee]. 
+GCs are sites of dense star formation, comprised of $10^5 - 10^7$ stars that were roughly formed around the same time. 
+GCs hence provide a convenient starting point for understanding and assessing the chemical origins of stars in the Milky Way.
+Nonetheless, this is only a starting point --- we note that many stars in the APOGEE survey have been assigned to GCs based on proximity while there is also the broader open question of discovering deeper shared origins of possibly distant bodies.
 
-A detailed data dictionary can be found [here](https://data.sdss.org/datamodel/files/APOGEE_ASPCAP/APRED_VERS/ASPCAP_VERS/allStar.html).
+We next perform some basic quality control filtering. 
+Specifically, following previous literature [@pagnini2025abundance], we subset the stars to those that meet the criteria below:
 
-Next, performing some basic quality control filtering. (Need to explain, justify, and elaborate on this step).
+- Signal-to-noise (S/N) ratio threshold greater than 70
+- Effective temperature $T_{eff}$ ranges between 3500 and 5500
+- Logarithm of the surface gravity $\log g$ less than 3.6
+- GC membership probability greater than 0.9
+- STARFLAG parameter (indicating poor quality measurements) is set to 0
+
+This quality control filtering resulted in a sample of 3,286 observations (or stars). We will investigate alternative, but equally-reasonable quality control filtering choices in a future section.
 
 ```{r}
 # QC filtering choices
@@ -66,7 +78,7 @@ data_qc_filtered <- apply_qc_filtering(
 )
 ```
 
-Quick overview of the data after QC filtering...
+Below, we provide a quick overview of the data after quality control filtering.
 
 :::{.panel-tabset}
 
@@ -111,7 +123,7 @@ data_qc_filtered$meta |>
 
 :::
 
-Before proceeding any further, we will split data into training and test using 80-20% split.
+Before proceeding any further, we randomly split the data into training and test using an 80-20% split. This led to a training set of 2,628 observations and a test set of 658 observations. 
 
 ```{r}
 # Split data into training and test sets
@@ -128,7 +140,7 @@ train_metadata <- data_qc_filtered$meta[train_idxs, ]
 test_metadata <- data_qc_filtered$meta[-train_idxs, ]
 ```
 
-Now imputing missing values and standardizing the data. We will try imputing using mean and random forest imputation.
+We next impute missing abundance values in the data and standardize each elemental abundance feature to have mean 0 and standard deviation 1. Given that there are various ways to perform missing data imputation, we implement two different imputation methods: (1) mean imputation and (2) random forest imputation using MissForest [@stekhoven2012missforest].
 
 ```{r}
 # impute missing values and standardize data

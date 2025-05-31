@@ -44,6 +44,25 @@ if (is.na(NCORES)) {
 
 ## Fit Clustering Pipelines on Training Data
 
+In this section, we detail our clustering pipeline.
+
+**Clustering Methods Under Study:**
+
+- K-means Clustering
+- Hierarchical Clustering with Euclidean distance and either complete or Ward's linkage
+- Spectral Clustering with nearest neighbors affinity and number of neighbors = 5, 30, 60, or 100
+
+For each of these clustering methods, we examine the clustering results across different choices of the number of clusters $k = 2, \ldots, 30$.
+
+There are also many different ways one could apply these clustering methods. 
+For example, one could apply it to the chemical abundance data directly or to a dimension-reduced version of the chemical abundance data. 
+There are also other preprocessing choices, such as how to perform quality control filtering, which chemical abundance features are used, and how to impute missing data.
+In the figure below, we outline the various data preprocessing pipelines (prior to clustering) that are considered in this case study.
+Note that we only included the (tuned) dimension reduction methods that exhibited high neighborhood retention from the previous investigation (i.e., PCA, tSNE (perplexity = 30), and tSNE (perplexity = 100)), and for PCA, the top four components were chosen based on the scree plot.
+We will refer to the set of these data preprocessing pipelines as $\mathcal{G}$.
+
+![Set of data preprocessing pipelines considered prior to applying clustering methods in case study. Pipelines marked with an astericks were excluded to reduce the computational burden; however, results are similar even when including these pipelines.](../figures/data_preprocessing_pipeline.jpg){width="75%"}
+
 ```{r}
 #| code-summary: "Show Code to Fit Clustering Pipelines on Training Data"
 
@@ -198,7 +217,7 @@ if (!file.exists(fit_results_fname)) {
 }
 ```
 
-To see and interact with clustering results on training data, we have developed a shiny app. Run locally in R/RStudio:
+To see and interact with the training clustering results, we have developed a shiny app, which can be run locally in R/RStudio by typing the following in your R console:
 
 ```{r}
 #| eval: false
@@ -208,6 +227,13 @@ view_clusters_app()
 ```
 
 ## Hyperparameter Tuning and Model Selection via Cluster Stability
+
+To select the best clustering method and number of clusters $k$, we propose a stability-driven model selection procedure.
+Here, given our goal of working towards scientific discovery, we operate under the driving philosophy that our scientific conclusions should not be robust or stable across arbitrary human judgment calls such as the data preprocessing pipelines outlined in the above figure.
+Driven by this "stability principle", we hence select the clustering method and number of clusters that yields the most stable (or similar) clustering results regardless of the data subsample used for training and regardless of the choice of data preprocessing pipeline $g \in \mathcal{G}$.
+To operationalize this idea, we implement Algorithm 1 below, which is inspired by the Model Explorer algorithm from @ben2001stability.
+
+![](../figures/algorithm1.png){width="75%"}
 
 ```{r}
 #| code-summary: "Show Code to Tune/Evaluate Clustering Pipelines via Cluster Stability"
@@ -369,6 +395,15 @@ if (!file.exists(fit_results_fname) ||
 }
 ```
 
+The main results from our stability-driven model selection procedure are shown in the figure below under the `Per Clustering Method` tab.
+
+**Main Takeaways:**
+
+- Spectral clustering (n\_neighbors = 60) with $k = 2$ clusters yields the most stable clusters
+- Interestingly, K-means with $k = 8$ clusters also appears quite stable, considering that it is producing far more granular clusters than $k = 2$.
+
+*Note: For completeness, the stability across subsamples per data preprocessing + clustering pipeline is provided under the `Per Pipeline` tab.*
+
 :::{.panel-tabset .column-page-right}
 
 ```{r}
@@ -408,6 +443,8 @@ for (stability_mode in names(stability_results_ls)) {
 :::
 
 ## Estimate Consensus Clusters
+
+For both Spectral Clustering (n\_neighbors = 60) with $k = 2$ clusters and K-means with $k = 8$ clusters, we next aggregate the learned clusters across each of the data preprocessing pipelines using consensus clustering.
 
 ```{r}
 #| code-summary: "Show Code to Estimate Consensus Clusters"
@@ -468,6 +505,15 @@ if (!file.exists(consensus_clusters_results_path) |
   nbhd_mat_ls <- readRDS(consensus_nbhd_results_path)
 }
 ```
+
+We visualize the resulting training consensus clusters in various ways below. Note:
+
+- The frequencies shown in the consensus neighborhood heatmaps reveal the proportion of times that two stars were assigned to the same cluster across the different choices of data preprocessing pipelines.
+    - High frequencies close to 1 indicate that the two stars were almost always in the same cluster. 
+    - Low frequencies close to 0 in the consensus neighborhood heatmaps indicate that the two stars were almost never in the same cluster.
+- For each star, we define its local stability to be the average co-clustering frequency (i.e., the value shown in the consensus neighborhood heatmap) with all other stars in the same cluster. Intuitively, the local stability score for a star captures how consistently the star is clustered with other stars in its estimated cluster. Low local stability suggests that the star is not consistently clustered and may "hop" from one cluster to another depending on the data preprocessing choices.
+
+Clearly, we observe that the two clusters from Spectral Clustering (n\_neighbors = 60) are extremely stable; however, these two clusters largely recapitulate a well-known iron-rich versus iron-poor dichotomy between younger versus older stars in the Milky Way. Consequently, in an effort to seek new insights beyond this well-known phenomenon, we will turn our attention to the 8 clusters from K-means clustering for the remainder of this analysis.
 
 :::{.panel-tabset}
 
@@ -586,9 +632,26 @@ for (key in c("k = 2: Spectral (n_neighbors = 60)", "k = 8: K-means")) {
 
 :::
 
-## Aside: What if...
+## Aside: What ifs...
 
-What if we had used Spectral Clustering (n neighbors = 60) with k = 9?
+In this section, we explore two hypothetical "what if" scenarios purely for didactic purposes.
+
+**First, what if we had chosen to use Spectral Clustering (n\_neighbors = 60) with $k = 9$ clusters, which yields a similar stability score as K-means with $k = 8$ clusters?**
+
+In short, the clusters from Spectral Clustering (n\_neighbors = 60) with $k = 9$ clusters are quite similar to the that from K-means with $k = 8$ clusters. 
+This is most easily seen in the neighborhood heatmap below, which shows the co-cluster membership of each pair of stars. 
+Red indicates that the two stars were in the same cluster in both clustering methods. 
+Black indicates that the two stars were in different clusters in both clustering methods. 
+White indicates that the two stars were in the same cluster in one clustering method but not the other. 
+
+Notably, cluster 2 from spectral clustering perfectly matches cluster 2 from K-means clustering. There is also very close alignment between several other clusters across methods, namely:
+
+- Spectral cluster 1 and K-means cluster 1
+- Spectral cluster 3 and K-means cluster 3
+- Spectral cluster 7 and K-means cluster 6
+- Spectral cluster 9 and K-means cluster 8
+
+Furthermore, it appears that K-means cluster 4 is being split into two clusters by spectral clustering (clusters 4 and 6).
 
 :::{.panel-tabset}
 
@@ -744,7 +807,13 @@ for (key in c("k = 9: Spectral (n_neighbors = 60)")) {
 
 :::
 
-What if we had used only the most stable clustering pipeline and done consensus clustering on the subsampled fits?
+**Second, what if we had chosen to use only the most stable data preprocessing + clustering pipeline (i.e., K-means [Mean-imputed + Small + Raw]) instead of using the consensus across all data preprocessing pipelines?**
+
+The most stable data preprocessing + clustering pipeline choice is K-means, applied to the small feature set with mean-imputation and no dimension reduction prior to clustering. 
+Applying this particular instantiation of K-means led to reasonable clusters, shown below. 
+However, in the neighborhood heatmap, we observe an important difference between the consensus K-means pipeline (aggregated across all data preprocessing pipelines) versus the most stable K-means pipeline (using only the most stable data preprocessing choice) --- that is, the most stable K-means pipeline grouped the consensus cluster 1 and consensus cluster 2 into a single cluster and created what appears to be a small and seemingly noisy cluster ("Most Stable Cluster 6"). 
+Examining the GCs in each estimated cluster, we further see that the consensus K-means pipeline was able to separate two important GCs into distinct clusters --- NGC6121 (dark green bar in cluster 1) and NGC0104 (orange bar in cluster 2) --- while the most stable K-means pipeline grouped these two GCs into a single cluster.
+This is to show that the diversity of clusters across data preprocessing pipelines can help to improve the quality of the resulting clusters.
 
 ```{r}
 #| echo: false

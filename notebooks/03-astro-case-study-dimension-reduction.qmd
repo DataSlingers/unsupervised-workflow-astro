@@ -42,6 +42,17 @@ set.seed(12345)
 
 ## Dimension Reduction
 
+We next explore various dimension reduction techniques for both visualization purposes and for possibly reducing the data dimensions prior to clustering.
+
+**Dimension Reduction Methods Under Study:**
+
+- Principal Component Analysis (PCA)
+- tSNE with 2 dimensions and perplexity = 10, 30, 60, 100, or 300
+- UMAP with 2 dimensions and number of neighbors = 10, 30, 60, 100, or 300
+
+Each of these dimension reduction methods was applied either to 
+(i) the small set of 7 chemical abundance features ($FE_{H}, MG_{FE}, O_{FE}, SI_{FE}, CA_{FE}, NI_{FE}, AL_{FE}$), (ii) the medium set of 11 chemical abundance features ((i) plus $C_{FE}, MN_{FE}, N_{FE}, K_{FE}$), or (iii) the full set of 19 chemical abundance features ((ii) plus $CI_{FE}, NA_{FE}, S_{FE}, TI_{FE},$ $TIII_{FE}, V_{FE}, CR_{FE}, CO_{FE}$).
+
 ```{r}
 #| code-summary: "Show Code to Fit Dimension Reduction Methods"
 
@@ -98,6 +109,9 @@ plt_df <- purrr::list_flatten(dr_fit_ls, name_spec = "{inner} [{outer}]") |>
   dr_results_to_df()
 ```
 
+**Hyperparameter Tuning:** To tune hyperparameters in tSNE and UMAP, we use the neighborhood retention metric, which measures the fraction of its $k$ nearest neighbors retained in the dimension-reduced space compared to the original space.
+A higher neighborhood retention rate indicates a better dimension reduction method.
+
 ```{r}
 #| code-summary: "Show Code to Tune/Evaluate Dimension Reduction Methods"
 
@@ -139,7 +153,15 @@ eval_plt_df <- purrr::list_flatten(
 
 ### Hyperparameter Tuning via Neighborhood Retention
 
-UMAP always below tSNE (100)
+Below, we show an interactive plot (using plotly) of the neighborhood retention with varied number of neighbors $k$ for each dimension reduction technique, applied to the various sets of abundance features (small, medium, and big). 
+
+**Main Takeaways:**
+
+- Regardless of the choice of number of neighbors $k$ or the hyperparameter in UMAP, UMAP almost always yields worse neighborhood retention than tSNE (e.g., with perplexity = 100).
+- Of the tSNE fits, there is no single tSNE hyperparameter that uniformly outperforms the others. However, tSNE with perplexity = 30 and 100 appear to strike a healthy balance between preserving local (i.e., small neighborhood sizes) and global (i.e., large neighborhood sizes) structure in the data, with perplexity = 30 performing slightly better at preserving local structure and perplexity = 100 performing slightly better at preserving global structure.
+- PCA expectedly yields the best neighborhood retention at large neighborhood sizes and is the best at preserving global structure in the data.
+
+*Note: try clicking on the legend to toggle the visibility of different dimension reduction methods.*
 
 ```{r}
 #| output: asis
@@ -177,6 +199,12 @@ plotly::ggplotly(plt)
 
 
 ### Dimension Reduction Plots
+
+We provide various visualizations of the dimension reduction results below, including:
+
+- Scatter plots of the first two components from each dimension reduction method, colored by the star's GC
+- (Jittered) galactic coordinate plots of the stars, colored by the first and second components from each dimension reduction method
+- Heatmaps of the principal component loadings from PCA
 
 :::{.panel-tabset}
 
